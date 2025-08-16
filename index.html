@@ -1,0 +1,63 @@
+<!doctype html>
+<html lang="ru">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title>Личный кабинет — Заказы</title>
+  <link rel="stylesheet" href="style.css" />
+</head>
+<body>
+  <noscript><div style="padding:12px;background:#fde68a;color:#7c2d12;">Для работы страницы нужен JavaScript.</div></noscript>
+
+  <header class="app-header" role="banner">
+    <div class="brand">
+      <div class="logo" aria-hidden="true">🪚</div>
+      <div class="brand-text">
+        <strong>Кабинет клиента</strong>
+        <span>Оформление заказов мебельного производства</span>
+      </div>
+    </div>
+
+    <div class="header-actions">
+      <button id="btnCreateOrder" class="btn primary">+ Новый заказ</button>
+      <button id="btnExportCsv" class="btn">Экспорт CSV</button>
+      <button id="btnClearFilters" class="btn ghost" title="Сбросить фильтры">Сбросить</button>
+      <div class="profile" role="navigation" aria-label="Профиль">
+        <span id="profileName">—</span>
+        <span class="divider">•</span>
+        <a href="#" id="openProfile">Профиль</a>
+      </div>
+    </div>
+  </header>
+
+  <main class="container" id="app" role="main">
+    <section id="filters" class="filters" aria-label="Фильтры и поиск"></section>
+
+    <section class="table-wrap" aria-live="polite">
+      <div id="bulkBar" class="bulk-bar hidden" role="region" aria-label="Групповые действия">
+        <span id="bulkCount">0 выбрано</span>
+        <div class="spacer"></div>
+        <button id="bulkDuplicate" class="btn">Дублировать</button>
+        <button id="bulkArchive" class="btn danger">В архив</button>
+      </div>
+
+      <div id="ordersTable" class="card"></div>
+      <div id="pagination" class="pagination"></div>
+    </section>
+  </main>
+
+  <footer class="app-footer">
+    <span>⏳ Автосохранение черновиков: включено</span>
+    <span class="divider">•</span>
+    <span>Справочники материалов/финишей — демо</span>
+  </footer>
+
+  <!-- Контейнер модалок/слайдоверов -->
+  <div id="modalHost" class="modal-host" aria-live="polite"></div>
+  <div id="toastHost" class="toast-host" aria-live="polite" aria-atomic="true"></div>
+
+  <!-- JS файлы -->
+  <script src="demo-data.js"></script>
+  <script src="app.js"></script>
+</body>
+</html>
