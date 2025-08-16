@@ -241,6 +241,7 @@ function openOrderDrawer({mode='view', order, onSave}){
     <div class="drawer open" role="dialog" aria-label="Заказ">
     <div class="hdr">
       <div>
+        <button class="btn" id="btnBack">← Назад к списку</button>
         <div class="help">${order.order_no}</div>
         <strong>${escapeHtml(order.name)}</strong>
       </div>
@@ -284,6 +285,7 @@ function openOrderDrawer({mode='view', order, onSave}){
 
   const close = ()=> host.innerHTML='';
   host.querySelector('#btnClose').onclick = close;
+  host.querySelector('#btnBack').onclick = close;
   host.querySelector('.drawer-overlay').addEventListener('click', e => { if(e.target.classList.contains('drawer-overlay')) close(); });
   const btnToggle = host.querySelector('#btnEditToggle'); if(btnToggle) btnToggle.onclick = ()=>openOrderDrawer({mode: editable?'view':'edit', order, onSave});
 
@@ -457,7 +459,6 @@ window.addEventListener('DOMContentLoaded', () => {
 
     // Кнопки хедера
     document.getElementById('btnCreateOrder')?.addEventListener('click', onCreateOrder);
-    document.getElementById('btnExportCsv')?.addEventListener('click', onExportCsv);
     document.getElementById('btnClearFilters')?.addEventListener('click', ()=>{
       localStorage.removeItem('client-filters-v1');
       appState.view.filters = defaultFilters(appState.data.projects);
@@ -601,25 +602,7 @@ function archiveOrder(id){
   o.is_archived=true; o.archived_at=new Date(); o.updated_at=new Date();
 }
 
-function onExportCsv(){
-  console.log('Экспорт CSV...');
-  const { data } = appState; const f = appState.view.filters;
-  let list = [...data.orders];
-  if(!f.showArchived) list = list.filter(o=> !o.is_archived);
-  if(f.onlyEditable) list = list.filter(o=> (o.status_code==='draft'||o.status_code==='revision') && !o.is_archived);
-  if(f.project && f.project!=='all') list = list.filter(o=> o.project_id===f.project);
-  if(f.q){ const q=f.q.toLowerCase(); list = list.filter(o=> (o.order_no+o.name).toLowerCase().includes(q)); }
-  if(f.period && f.period!=='all'){
-    const days = parseInt(f.period,10); const dt = Date.now()-days*86400000; list = list.filter(o=> new Date(o.created_at).getTime() >= dt);
-  }
-  if(f.statuses && f.statuses.size>0){ list = list.filter(o=> f.statuses.has(o.status_code)); }
 
-  const header = ['order_no','name','status','project','items','files','created_at'];
-  const rows = list.map(o=> [o.order_no, clean(o.name), statusRu(o.status_code), (o.project_name||''), o.items.length, o.files.length, new Date(o.created_at).toLocaleDateString('ru-KZ')] );
-  const csv = [header.join(','), ...rows.map(r=> r.map(csvEscape).join(','))].join('\n');
-  const blob = new Blob([csv], {type:'text/csv;charset=utf-8;'});
-  const a = document.createElement('a'); a.href=URL.createObjectURL(blob); a.download=`orders_${Date.now()}.csv`; a.click(); URL.revokeObjectURL(a.href);
-}
 
 function cmp(a,b,by,dir){
   const va = a[by]; const vb = b[by];

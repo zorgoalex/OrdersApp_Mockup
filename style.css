@@ -89,7 +89,7 @@ body{
   inset: 0;
   background: rgba(0,0,0,.35);
   pointer-events: auto;
-  z-index: 40;
+  z-index: 50;
 }
 
 .drawer{
@@ -98,6 +98,8 @@ body{
   transform:translateX(100%); transition:transform .25s ease; box-shadow:-10px 0 30px rgba(0,0,0,.15)}
 .drawer.open{transform:translateX(0)}
 .drawer .hdr{display:flex; align-items:center; justify-content:space-between; padding:12px; border-bottom:1px solid var(--line)}
+.drawer .hdr > div:first-child{display:flex; flex-direction:column; gap:4px}
+.drawer .hdr > div:last-child{display:flex; gap:8px; align-items:center}
 .drawer .bd{padding:12px; overflow:auto; height:calc(100% - 52px)}
 
 .form-grid{display:grid; grid-template-columns:1fr; gap:10px}
