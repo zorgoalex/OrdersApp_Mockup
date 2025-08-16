@@ -1,62 +1,341 @@
-<!doctype html>
+<!DOCTYPE html>
 <html lang="ru">
 <head>
-  <meta charset="utf-8" />
-  <meta name="viewport" content="width=device-width, initial-scale=1" />
-  <title>Личный кабинет — Заказы</title>
-  <link rel="stylesheet" href="style.css" />
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Личный кабинет - WoodCraft</title>
+    <link rel="stylesheet" href="style.css">
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css" rel="stylesheet">
 </head>
 <body>
-  <noscript><div style="padding:12px;background:#fde68a;color:#7c2d12;">Для работы страницы нужен JavaScript.</div></noscript>
+    <!-- Header -->
+    <header class="header">
+        <div class="container">
+            <div class="header-content">
+                <div class="logo">
+                    <i class="fas fa-tree"></i>
+                    <span>WoodCraft</span>
+                </div>
+                <nav class="nav">
+                    <a href="#" class="nav-link active">
+                        <i class="fas fa-clipboard-list"></i>
+                        Заказы
+                    </a>
+                    <a href="#" class="nav-link">
+                        <i class="fas fa-folder"></i>
+                        Проекты
+                    </a>
+                    <a href="#" class="nav-link">
+                        <i class="fas fa-user"></i>
+                        Профиль
+                    </a>
+                </nav>
+                <div class="user-menu">
+                    <div class="user-info">
+                        <span class="user-name">Иван Петров</span>
+                        <span class="user-email">ivan.petrov@example.com</span>
+                    </div>
+                    <button class="user-avatar" onclick="toggleUserMenu()">
+                        <i class="fas fa-user-circle"></i>
+                    </button>
+                    <div class="user-dropdown" id="userDropdown">
+                        <a href="#" class="dropdown-item">
+                            <i class="fas fa-cog"></i>
+                            Настройки
+                        </a>
+                        <a href="#" class="dropdown-item">
+                            <i class="fas fa-sign-out-alt"></i>
+                            Выйти
+                        </a>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </header>
 
-  <header class="app-header" role="banner">
-    <div class="brand">
-      <div class="logo" aria-hidden="true">🪚</div>
-      <div class="brand-text">
-        <strong>Кабинет клиента</strong>
-        <span>Оформление заказов мебельного производства</span>
-      </div>
+    <!-- Main Content -->
+    <main class="main">
+        <div class="container">
+            <!-- Page Header -->
+            <div class="page-header">
+                <div class="page-title">
+                    <h1>Мои заказы</h1>
+                    <p class="page-subtitle">Управление заказами и отслеживание статусов</p>
+                </div>
+                <div class="page-actions">
+                    <button class="btn btn-secondary" onclick="showFilters()">
+                        <i class="fas fa-filter"></i>
+                        Фильтры
+                    </button>
+                    <button class="btn btn-primary" onclick="createNewOrder()">
+                        <i class="fas fa-plus"></i>
+                        Новый заказ
+                    </button>
+                </div>
+            </div>
+
+            <!-- Quick Stats -->
+            <div class="stats-grid">
+                <div class="stat-card">
+                    <div class="stat-icon draft">
+                        <i class="fas fa-edit"></i>
+                    </div>
+                    <div class="stat-content">
+                        <div class="stat-number" id="draftCount">3</div>
+                        <div class="stat-label">Черновики</div>
+                    </div>
+                </div>
+                <div class="stat-card">
+                    <div class="stat-icon submitted">
+                        <i class="fas fa-clock"></i>
+                    </div>
+                    <div class="stat-content">
+                        <div class="stat-number" id="submittedCount">2</div>
+                        <div class="stat-label">На проверке</div>
+                    </div>
+                </div>
+                <div class="stat-card">
+                    <div class="stat-icon approved">
+                        <i class="fas fa-check-circle"></i>
+                    </div>
+                    <div class="stat-content">
+                        <div class="stat-number" id="approvedCount">8</div>
+                        <div class="stat-label">Принято</div>
+                    </div>
+                </div>
+                <div class="stat-card">
+                    <div class="stat-icon revision">
+                        <i class="fas fa-undo"></i>
+                    </div>
+                    <div class="stat-content">
+                        <div class="stat-number" id="revisionCount">1</div>
+                        <div class="stat-label">На доработку</div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Filters Panel -->
+            <div class="filters-panel" id="filtersPanel">
+                <div class="filters-content">
+                    <div class="filter-group">
+                        <label for="statusFilter">Статус</label>
+                        <select id="statusFilter" onchange="applyFilters()">
+                            <option value="">Все статусы</option>
+                            <option value="draft">Черновик</option>
+                            <option value="submitted">На проверке</option>
+                            <option value="approved">Принят</option>
+                            <option value="revision">На доработку</option>
+                        </select>
+                    </div>
+                    <div class="filter-group">
+                        <label for="projectFilter">Проект</label>
+                        <select id="projectFilter" onchange="applyFilters()">
+                            <option value="">Все проекты</option>
+                            <option value="kitchen">Кухня Модерн</option>
+                            <option value="bedroom">Спальня Классик</option>
+                            <option value="office">Офисная мебель</option>
+                        </select>
+                    </div>
+                    <div class="filter-group">
+                        <label for="dateFilter">Период</label>
+                        <select id="dateFilter" onchange="applyFilters()">
+                            <option value="">Все время</option>
+                            <option value="today">Сегодня</option>
+                            <option value="week">Эта неделя</option>
+                            <option value="month">Этот месяц</option>
+                            <option value="quarter">3 месяца</option>
+                        </select>
+                    </div>
+                    <div class="filter-group">
+                        <label>
+                            <input type="checkbox" id="showArchived" onchange="applyFilters()">
+                            Показать архивные
+                        </label>
+                    </div>
+                    <div class="filter-actions">
+                        <button class="btn btn-secondary btn-sm" onclick="resetFilters()">
+                            <i class="fas fa-times"></i>
+                            Сбросить
+                        </button>
+                        <button class="btn btn-primary btn-sm" onclick="hideFilters()">
+                            <i class="fas fa-check"></i>
+                            Применить
+                        </button>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Search Bar -->
+            <div class="search-bar">
+                <div class="search-input-wrapper">
+                    <i class="fas fa-search search-icon"></i>
+                    <input type="text" id="searchInput" placeholder="Поиск по номеру заказа, названию..." onkeyup="searchOrders()">
+                    <button class="clear-search" onclick="clearSearch()" style="display: none;">
+                        <i class="fas fa-times"></i>
+                    </button>
+                </div>
+            </div>
+
+            <!-- Orders Table -->
+            <div class="table-container" id="ordersTableContainer">
+                <div class="table-header">
+                    <div class="table-title">
+                        <span id="ordersCount">Найдено заказов: 14</span>
+                    </div>
+                    <div class="table-actions">
+                        <button class="btn btn-secondary btn-sm" onclick="exportOrders()">
+                            <i class="fas fa-download"></i>
+                            Экспорт
+                        </button>
+                    </div>
+                </div>
+                <div class="table-wrapper">
+                    <table class="orders-table" id="ordersTable">
+                        <thead>
+                            <tr>
+                                <th onclick="sortTable('order_no')">
+                                    Номер заказа
+                                    <i class="fas fa-sort sort-icon"></i>
+                                </th>
+                                <th onclick="sortTable('name')">
+                                    Название
+                                    <i class="fas fa-sort sort-icon"></i>
+                                </th>
+                                <th onclick="sortTable('project')">
+                                    Проект
+                                    <i class="fas fa-sort sort-icon"></i>
+                                </th>
+                                <th onclick="sortTable('status')">
+                                    Статус
+                                    <i class="fas fa-sort sort-icon"></i>
+                                </th>
+                                <th onclick="sortTable('items_count')">
+                                    Деталей
+                                    <i class="fas fa-sort sort-icon"></i>
+                                </th>
+                                <th onclick="sortTable('files_count')">
+                                    Файлов
+                                    <i class="fas fa-sort sort-icon"></i>
+                                </th>
+                                <th onclick="sortTable('updated_at')">
+                                    Обновлен
+                                    <i class="fas fa-sort sort-icon"></i>
+                                </th>
+                                <th>Действия</th>
+                            </tr>
+                        </thead>
+                        <tbody id="ordersTableBody">
+                            <!-- Orders will be populated by JavaScript -->
+                        </tbody>
+                    </table>
+                </div>
+                
+                <!-- Empty State -->
+                <div class="empty-state" id="emptyState" style="display: none;">
+                    <div class="empty-icon">
+                        <i class="fas fa-clipboard-list"></i>
+                    </div>
+                    <h3>Заказы не найдены</h3>
+                    <p>Попробуйте изменить параметры поиска или создайте новый заказ</p>
+                    <button class="btn btn-primary" onclick="createNewOrder()">
+                        <i class="fas fa-plus"></i>
+                        Создать заказ
+                    </button>
+                </div>
+            </div>
+
+            <!-- Pagination -->
+            <div class="pagination-container" id="paginationContainer">
+                <div class="pagination-info">
+                    <span id="paginationInfo">Показано 1-10 из 14 заказов</span>
+                </div>
+                <div class="pagination" id="pagination">
+                    <!-- Pagination will be generated by JavaScript -->
+                </div>
+            </div>
+        </div>
+    </main>
+
+    <!-- Order Details Modal -->
+    <div class="modal" id="orderDetailsModal">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h3 id="modalOrderTitle">Детали заказа</h3>
+                <button class="modal-close" onclick="closeModal('orderDetailsModal')">
+                    <i class="fas fa-times"></i>
+                </button>
+            </div>
+            <div class="modal-body" id="orderDetailsContent">
+                <!-- Content will be populated by JavaScript -->
+            </div>
+        </div>
     </div>
 
-    <div class="header-actions">
-      <button id="btnCreateOrder" class="btn primary">+ Новый заказ</button>
-      <button id="btnClearFilters" class="btn ghost" title="Сбросить фильтры">Сбросить</button>
-      <div class="profile" role="navigation" aria-label="Профиль">
-        <span id="profileName">—</span>
-        <span class="divider">•</span>
-        <a href="#" id="openProfile">Профиль</a>
-      </div>
+    <!-- Order Form Modal -->
+    <div class="modal" id="orderFormModal">
+        <div class="modal-content large">
+            <div class="modal-header">
+                <h3 id="formModalTitle">Новый заказ</h3>
+                <button class="modal-close" onclick="closeModal('orderFormModal')">
+                    <i class="fas fa-times"></i>
+                </button>
+            </div>
+            <div class="modal-body" id="orderFormContent">
+                <!-- Form content will be populated by JavaScript -->
+            </div>
+        </div>
     </div>
-  </header>
 
-  <main class="container" id="app" role="main">
-    <section id="filters" class="filters" aria-label="Фильтры и поиск"></section>
+    <!-- Confirmation Modal -->
+    <div class="modal" id="confirmModal">
+        <div class="modal-content small">
+            <div class="modal-header">
+                <h3 id="confirmTitle">Подтверждение</h3>
+                <button class="modal-close" onclick="closeModal('confirmModal')">
+                    <i class="fas fa-times"></i>
+                </button>
+            </div>
+            <div class="modal-body">
+                <p id="confirmMessage">Вы уверены?</p>
+                <div class="modal-actions">
+                    <button class="btn btn-secondary" onclick="closeModal('confirmModal')">Отмена</button>
+                    <button class="btn btn-primary" id="confirmAction">Подтвердить</button>
+                </div>
+            </div>
+        </div>
+    </div>
 
-    <section class="table-wrap" aria-live="polite">
-      <div id="bulkBar" class="bulk-bar hidden" role="region" aria-label="Групповые действия">
-        <span id="bulkCount">0 выбрано</span>
-        <div class="spacer"></div>
-        <button id="bulkDuplicate" class="btn">Дублировать</button>
-        <button id="bulkArchive" class="btn danger">В архив</button>
-      </div>
+    <!-- Loading Indicator -->
+    <div class="loading-overlay" id="loadingOverlay" style="display: none;">
+        <div class="loading-spinner">
+            <i class="fas fa-spinner fa-spin"></i>
+            <p>Загрузка...</p>
+        </div>
+    </div>
 
-      <div id="ordersTable" class="card"></div>
-      <div id="pagination" class="pagination"></div>
-    </section>
-  </main>
+    <!-- Success Notification -->
+    <div class="notification success" id="successNotification" style="display: none;">
+        <i class="fas fa-check-circle"></i>
+        <span id="successMessage">Операция выполнена успешно</span>
+        <button onclick="hideNotification('successNotification')">
+            <i class="fas fa-times"></i>
+        </button>
+    </div>
 
-  <footer class="app-footer">
-    <span>⏳ Автосохранение черновиков: включено</span>
-    <span class="divider">•</span>
-    <span>Справочники материалов/финишей — демо</span>
-  </footer>
+    <!-- Error Notification -->
+    <div class="notification error" id="errorNotification" style="display: none;">
+        <i class="fas fa-exclamation-circle"></i>
+        <span id="errorMessage">Произошла ошибка</span>
+        <button onclick="hideNotification('errorNotification')">
+            <i class="fas fa-times"></i>
+        </button>
+    </div>
 
-  <!-- Контейнер модалок/слайдоверов -->
-  <div id="modalHost" class="modal-host" aria-live="polite"></div>
-  <div id="toastHost" class="toast-host" aria-live="polite" aria-atomic="true"></div>
-
-  <!-- JS файлы -->
-  <script src="demo-data.js"></script>
-  <script src="app.js"></script>
+    <!-- Scripts -->
+    <script src="demo-data.js"></script>
+    <script src="filters.js"></script>
+    <script src="table.js"></script>
+    <script src="popups.js"></script>
+    <script src="main.js"></script>
 </body>
 </html>
