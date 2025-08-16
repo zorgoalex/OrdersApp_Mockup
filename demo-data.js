@@ -350,7 +350,413 @@ const demoOrders = [
         ],
         files: []
     },
-    // Archived orders
+    // Добавляем дополнительные заказы для демонстрации скролла
+    {
+        id: 'order9',
+        order_no: 'W-2025-009',
+        prefix: 'W',
+        client_id: 'client1',
+        project_id: 'proj1',
+        name: 'Шкафы навесные',
+        note: 'Навесные шкафы для кухни',
+        status_code: 'draft',
+        is_archived: false,
+        archived_at: null,
+        submitted_at: null,
+        approved_at: null,
+        version: 1,
+        created_at: '2025-02-16T10:00:00Z',
+        updated_at: '2025-02-16T10:30:00Z',
+        items: [
+            {
+                id: 'item11',
+                width: 300.00,
+                height: 720.00,
+                quantity: 4,
+                material_id: 'mat1',
+                milling_type_id: 'mill1',
+                finish_code: 'film',
+                film_id: 'film1',
+                paint_id: null,
+                note: 'Корпуса шкафов'
+            },
+            {
+                id: 'item12',
+                width: 296.00,
+                height: 716.00,
+                quantity: 4,
+                material_id: 'mat1',
+                milling_type_id: 'mill1',
+                finish_code: 'film',
+                film_id: 'film1',
+                paint_id: null,
+                note: 'Задние стенки'
+            }
+        ],
+        files: []
+    },
+    {
+        id: 'order10',
+        order_no: 'W-2025-010',
+        prefix: 'W',
+        client_id: 'client1',
+        project_id: 'proj2',
+        name: 'Комод в спальню',
+        note: 'Комод с выдвижными ящиками',
+        status_code: 'submitted',
+        is_archived: false,
+        archived_at: null,
+        submitted_at: '2025-02-15T14:00:00Z',
+        approved_at: null,
+        version: 1,
+        created_at: '2025-02-15T13:00:00Z',
+        updated_at: '2025-02-15T14:00:00Z',
+        items: [
+            {
+                id: 'item13',
+                width: 800.00,
+                height: 400.00,
+                quantity: 1,
+                material_id: 'mat4',
+                milling_type_id: 'mill1',
+                finish_code: 'raw',
+                film_id: null,
+                paint_id: null,
+                note: 'Столешница комода'
+            },
+            {
+                id: 'item14',
+                width: 780.00,
+                height: 350.00,
+                quantity: 4,
+                material_id: 'mat4',
+                milling_type_id: 'mill1',
+                finish_code: 'raw',
+                film_id: null,
+                paint_id: null,
+                note: 'Фасады ящиков'
+            }
+        ],
+        files: []
+    },
+    {
+        id: 'order11',
+        order_no: 'W-2025-011',
+        prefix: 'W',
+        client_id: 'client1',
+        project_id: 'proj3',
+        name: 'Стеллажи офисные',
+        note: 'Модульные стеллажи для документов',
+        status_code: 'approved',
+        is_archived: false,
+        archived_at: null,
+        submitted_at: '2025-02-14T12:00:00Z',
+        approved_at: '2025-02-14T15:20:00Z',
+        version: 1,
+        created_at: '2025-02-14T11:00:00Z',
+        updated_at: '2025-02-14T15:20:00Z',
+        items: [
+            {
+                id: 'item15',
+                width: 800.00,
+                height: 300.00,
+                quantity: 12,
+                material_id: 'mat1',
+                milling_type_id: 'mill1',
+                finish_code: 'film',
+                film_id: 'film1',
+                paint_id: null,
+                note: 'Полки стеллажей'
+            },
+            {
+                id: 'item16',
+                width: 800.00,
+                height: 2000.00,
+                quantity: 6,
+                material_id: 'mat1',
+                milling_type_id: 'mill1',
+                finish_code: 'film',
+                film_id: 'film1',
+                paint_id: null,
+                note: 'Боковые стойки'
+            }
+        ],
+        files: []
+    },
+    {
+        id: 'order12',
+        order_no: 'W-2025-012',
+        prefix: 'W',
+        client_id: 'client1',
+        project_id: 'proj1',
+        name: 'Цоколь кухни',
+        note: 'Декоративный цоколь',
+        status_code: 'draft',
+        is_archived: false,
+        archived_at: null,
+        submitted_at: null,
+        approved_at: null,
+        version: 1,
+        created_at: '2025-02-16T15:00:00Z',
+        updated_at: '2025-02-16T15:30:00Z',
+        items: [
+            {
+                id: 'item17',
+                width: 3000.00,
+                height: 100.00,
+                quantity: 2,
+                material_id: 'mat1',
+                milling_type_id: 'mill1',
+                finish_code: 'film',
+                film_id: 'film1',
+                paint_id: null,
+                note: 'Цокольные планки'
+            }
+        ],
+        files: []
+    },
+    {
+        id: 'order13',
+        order_no: 'W-2025-013',
+        prefix: 'W',
+        client_id: 'client1',
+        project_id: 'proj2',
+        name: 'Тумба под ТВ',
+        note: 'Низкая тумба в гостиную',
+        status_code: 'revision',
+        is_archived: false,
+        archived_at: null,
+        submitted_at: '2025-02-16T11:00:00Z',
+        approved_at: null,
+        version: 2,
+        created_at: '2025-02-16T10:00:00Z',
+        updated_at: '2025-02-16T12:30:00Z',
+        items: [
+            {
+                id: 'item18',
+                width: 1500.00,
+                height: 400.00,
+                quantity: 1,
+                material_id: 'mat2',
+                milling_type_id: 'mill2',
+                finish_code: 'paint',
+                film_id: null,
+                paint_id: 'paint2',
+                note: 'Столешница тумбы'
+            },
+            {
+                id: 'item19',
+                width: 1480.00,
+                height: 380.00,
+                quantity: 2,
+                material_id: 'mat2',
+                milling_type_id: 'mill1',
+                finish_code: 'paint',
+                film_id: null,
+                paint_id: 'paint2',
+                note: 'Дверцы тумбы'
+            }
+        ],
+        files: [],
+        revision_reason: 'Нужно изменить цвет краски на более темный'
+    },
+    {
+        id: 'order14',
+        order_no: 'W-2025-014',
+        prefix: 'W',
+        client_id: 'client1',
+        project_id: null,
+        name: 'Полки декоративные',
+        note: 'Настенные полки',
+        status_code: 'draft',
+        is_archived: false,
+        archived_at: null,
+        submitted_at: null,
+        approved_at: null,
+        version: 1,
+        created_at: '2025-02-17T09:00:00Z',
+        updated_at: '2025-02-17T09:15:00Z',
+        items: [
+            {
+                id: 'item20',
+                width: 600.00,
+                height: 200.00,
+                quantity: 3,
+                material_id: 'mat3',
+                milling_type_id: 'mill3',
+                finish_code: 'raw',
+                film_id: null,
+                paint_id: null,
+                note: 'Полки из фанеры'
+            }
+        ],
+        files: []
+    },
+    {
+        id: 'order15',
+        order_no: 'W-2025-015',
+        prefix: 'W',
+        client_id: 'client1',
+        project_id: 'proj3',
+        name: 'Рабочие столы',
+        note: 'Столы для open-space',
+        status_code: 'submitted',
+        is_archived: false,
+        archived_at: null,
+        submitted_at: '2025-02-17T14:30:00Z',
+        approved_at: null,
+        version: 1,
+        created_at: '2025-02-17T13:00:00Z',
+        updated_at: '2025-02-17T14:30:00Z',
+        items: [
+            {
+                id: 'item21',
+                width: 1400.00,
+                height: 700.00,
+                quantity: 6,
+                material_id: 'mat1',
+                milling_type_id: 'mill1',
+                finish_code: 'film',
+                film_id: 'film1',
+                paint_id: null,
+                note: 'Столешницы рабочих мест'
+            },
+            {
+                id: 'item22',
+                width: 650.00,
+                height: 720.00,
+                quantity: 12,
+                material_id: 'mat1',
+                milling_type_id: 'mill1',
+                finish_code: 'film',
+                film_id: 'film1',
+                paint_id: null,
+                note: 'Тумбы под столы'
+            }
+        ],
+        files: []
+    },
+    {
+        id: 'order16',
+        order_no: 'W-2025-016',
+        prefix: 'W',
+        client_id: 'client1',
+        project_id: 'proj1',
+        name: 'Островная столешница',
+        note: 'Центральный остров кухни',
+        status_code: 'approved',
+        is_archived: false,
+        archived_at: null,
+        submitted_at: '2025-02-16T16:00:00Z',
+        approved_at: '2025-02-17T10:00:00Z',
+        version: 1,
+        created_at: '2025-02-16T15:30:00Z',
+        updated_at: '2025-02-17T10:00:00Z',
+        items: [
+            {
+                id: 'item23',
+                width: 2000.00,
+                height: 900.00,
+                quantity: 1,
+                material_id: 'mat1',
+                milling_type_id: 'mill2',
+                finish_code: 'raw',
+                film_id: null,
+                paint_id: null,
+                note: 'Столешница острова'
+            }
+        ],
+        files: []
+    },
+    {
+        id: 'order17',
+        order_no: 'W-2025-017',
+        prefix: 'W',
+        client_id: 'client1',
+        project_id: 'proj2',
+        name: 'Встроенный шкаф',
+        note: 'Шкаф-купе в нишу',
+        status_code: 'draft',
+        is_archived: false,
+        archived_at: null,
+        submitted_at: null,
+        approved_at: null,
+        version: 1,
+        created_at: '2025-02-17T16:00:00Z',
+        updated_at: '2025-02-17T16:45:00Z',
+        items: [
+            {
+                id: 'item24',
+                width: 2500.00,
+                height: 600.00,
+                quantity: 4,
+                material_id: 'mat2',
+                milling_type_id: 'mill1',
+                finish_code: 'film',
+                film_id: 'film2',
+                paint_id: null,
+                note: 'Полки шкафа'
+            },
+            {
+                id: 'item25',
+                width: 1200.00,
+                height: 2400.00,
+                quantity: 2,
+                material_id: 'mat2',
+                milling_type_id: 'mill3',
+                finish_code: 'film',
+                film_id: 'film2',
+                paint_id: null,
+                note: 'Раздвижные дверцы'
+            }
+        ],
+        files: []
+    },
+    {
+        id: 'order18',
+        order_no: 'W-2025-018',
+        prefix: 'W',
+        client_id: 'client1',
+        project_id: null,
+        name: 'Барная стойка',
+        note: 'Высокая столешница с опорой',
+        status_code: 'submitted',
+        is_archived: false,
+        archived_at: null,
+        submitted_at: '2025-02-18T11:00:00Z',
+        approved_at: null,
+        version: 1,
+        created_at: '2025-02-18T10:00:00Z',
+        updated_at: '2025-02-18T11:00:00Z',
+        items: [
+            {
+                id: 'item26',
+                width: 1800.00,
+                height: 400.00,
+                quantity: 1,
+                material_id: 'mat4',
+                milling_type_id: 'mill2',
+                finish_code: 'raw',
+                film_id: null,
+                paint_id: null,
+                note: 'Столешница бара'
+            },
+            {
+                id: 'item27',
+                width: 100.00,
+                height: 1100.00,
+                quantity: 2,
+                material_id: 'mat4',
+                milling_type_id: 'mill1',
+                finish_code: 'raw',
+                film_id: null,
+                paint_id: null,
+                note: 'Опорные стойки'
+            }
+        ],
+        files: []
+    },
+    // Архивные заказы
     {
         id: 'order7',
         order_no: 'W-2024-089',
@@ -417,6 +823,19 @@ const demoOrders = [
     }
 ];
 
+// Export data for use in other modules - перемещаем в начало
+window.demoData = {
+    orders: [], // Временно пустой массив
+    materials,
+    millingTypes,
+    films,
+    paints,
+    projects,
+    orderStatusHistory,
+    orderFiles,
+    helpers: {} // Временно пустой объект
+};
+
 // Helper functions to work with demo data
 const demoDataHelpers = {
     // Get material by ID
@@ -443,7 +862,8 @@ const demoDataHelpers = {
             files_count: order.files ? order.files.length : 0,
             total_quantity: order.items ? order.items.reduce((sum, item) => sum + item.quantity, 0) : 0,
             ui_status_label: demoDataHelpers.getStatusLabel(order.status_code),
-            is_editable: ['draft', 'revision'].includes(order.status_code) && !order.is_archived,
+            // Правильная логика редактирования: можно редактировать только черновики и на доработке, если не в архиве
+            is_editable: (order.status_code === 'draft' || order.status_code === 'revision') && !order.is_archived,
             is_returned_for_revision: order.status_code === 'revision',
             revision_reason: order.revision_reason || null
         }));
@@ -501,15 +921,6 @@ const demoDataHelpers = {
     }
 };
 
-// Export data for use in other modules
-window.demoData = {
-    orders: demoOrders,
-    materials,
-    millingTypes,
-    films,
-    paints,
-    projects,
-    orderStatusHistory,
-    orderFiles,
-    helpers: demoDataHelpers
-};
+// Теперь обновляем window.demoData с правильными данными
+window.demoData.orders = demoOrders;
+window.demoData.helpers = demoDataHelpers;

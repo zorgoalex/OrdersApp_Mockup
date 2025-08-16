@@ -313,6 +313,12 @@ function getFileIcon(extension) {
 
 // Create new order
 function createNewOrder() {
+    // Check if demo data is available
+    if (!window.demoData || !window.demoData.projects) {
+        showNotification('error', 'Данные еще загружаются, попробуйте через секунду');
+        return;
+    }
+    
     document.getElementById('formModalTitle').textContent = 'Новый заказ';
     document.getElementById('orderFormContent').innerHTML = renderOrderForm();
     
@@ -328,10 +334,26 @@ function createNewOrder() {
 // Edit order
 function editOrder(orderId) {
     const order = window.demoData.orders.find(o => o.id === orderId);
-    if (!order) return;
+    if (!order) {
+        showNotification('error', 'Заказ не найден');
+        return;
+    }
     
-    if (!order.is_editable) {
-        showNotification('error', 'Заказ нельзя редактировать в текущем статусе');
+    // Проверяем возможность редактирования
+    const canEdit = (order.status_code === 'draft' || order.status_code === 'revision') && !order.is_archived;
+    
+    if (!canEdit) {
+        let message = 'Заказ нельзя редактировать. ';
+        if (order.is_archived) {
+            message += 'Заказ находится в архиве.';
+        } else if (order.status_code === 'submitted') {
+            message += 'Заказ на проверке.';
+        } else if (order.status_code === 'approved') {
+            message += 'Заказ уже принят.';
+        } else {
+            message += 'Недоступно для данного статуса.';
+        }
+        showNotification('error', message);
         return;
     }
     
@@ -416,7 +438,7 @@ function renderOrderForm(order = null) {
                             <h4>Детали заказа</h4>
                             <button type="button" class="btn btn-primary btn-sm" onclick="addNewItem()">
                                 <i class="fas fa-plus"></i>
-                                Добавить деталь
+                                <span>Добавить деталь</span>
                             </button>
                         </div>
                         <div class="items-container" id="itemsContainer">
@@ -424,9 +446,11 @@ function renderOrderForm(order = null) {
                         </div>
                         <div class="bulk-add-section">
                             <h5>Массовое добавление</h5>
-                            <p class="help-text">Вставьте строки в формате: Ширина x Высота x Количество (например: 300 x 400 x 2)</p>
+                            <p class="help-text">Вставьте строки в формате: Ширина x Высота x Количество<br>
+                            Поддерживаемые разделители: x, ×, *, пробел<br>
+                            Примеры: 300 x 400 x 2, 500*300*1, 800 600 3</p>
                             <textarea id="bulkItemsInput" rows="4" 
-                                      placeholder="300 x 400 x 2&#10;500 x 300 x 1&#10;..."></textarea>
+                                      placeholder="300 x 400 x 2&#10;500 * 300 * 1&#10;800 600 3"></textarea>
                             <button type="button" class="btn btn-secondary btn-sm" onclick="processBulkItems()">
                                 <i class="fas fa-plus-circle"></i>
                                 Добавить из текста
@@ -472,17 +496,18 @@ function renderOrderForm(order = null) {
                 
                 <div class="action-buttons">
                     <button type="button" class="btn btn-secondary" onclick="closeModal('orderFormModal')">
-                        Отмена
+                        <i class="fas fa-times"></i>
+                        <span>Отмена</span>
                     </button>
                     
                     <button type="button" class="btn btn-success" onclick="saveOrder()" id="saveButton">
                         <i class="fas fa-save"></i>
-                        Сохранить
+                        <span>Сохранить</span>
                     </button>
                     
                     <button type="button" class="btn btn-primary" onclick="submitOrderFromForm()" id="submitButton">
                         <i class="fas fa-paper-plane"></i>
-                        Отправить на проверку
+                        <span>Отправить на проверку</span>
                     </button>
                 </div>
             </div>
@@ -1026,18 +1051,48 @@ function renderItemForm(item = {}) {
                 <div class="size-group">
                     <div class="form-group">
                         <label>Ширина (мм)</label>
-                        <input type="number" step="0.01" min="20" max="2800" value="${item.width || ''}" 
-                               onchange="markFormDirty()" oninput="markFormDirty()">
+                        <div class="number-input">
+                            <input type="number" step="1" min="20" max="2800" value="${Math.round(item.width) || ''}" 
+                                   onchange="markFormDirty()" oninput="markFormDirty()">
+                            <div class="number-controls">
+                                <button type="button" onclick="incrementValue(this, 1)">
+                                    <i class="fas fa-chevron-up"></i>
+                                </button>
+                                <button type="button" onclick="incrementValue(this, -1)">
+                                    <i class="fas fa-chevron-down"></i>
+                                </button>
+                            </div>
+                        </div>
                     </div>
                     <div class="form-group">
                         <label>Высота (мм)</label>
-                        <input type="number" step="0.01" min="20" max="2800" value="${item.height || ''}" 
-                               onchange="markFormDirty()" oninput="markFormDirty()">
+                        <div class="number-input">
+                            <input type="number" step="1" min="20" max="2800" value="${Math.round(item.height) || ''}" 
+                                   onchange="markFormDirty()" oninput="markFormDirty()">
+                            <div class="number-controls">
+                                <button type="button" onclick="incrementValue(this, 1)">
+                                    <i class="fas fa-chevron-up"></i>
+                                </button>
+                                <button type="button" onclick="incrementValue(this, -1)">
+                                    <i class="fas fa-chevron-down"></i>
+                                </button>
+                            </div>
+                        </div>
                     </div>
                     <div class="form-group">
                         <label>Количество</label>
-                        <input type="number" min="1" value="${item.quantity || 1}" 
-                               onchange="markFormDirty()" oninput="markFormDirty()">
+                        <div class="number-input">
+                            <input type="number" step="1" min="1" value="${item.quantity || 1}" 
+                                   onchange="markFormDirty()" oninput="markFormDirty()">
+                            <div class="number-controls">
+                                <button type="button" onclick="incrementValue(this, 1)">
+                                    <i class="fas fa-chevron-up"></i>
+                                </button>
+                                <button type="button" onclick="incrementValue(this, -1)">
+                                    <i class="fas fa-chevron-down"></i>
+                                </button>
+                            </div>
+                        </div>
                     </div>
                 </div>
                 <div class="material-group">
@@ -1123,10 +1178,11 @@ function processBulkItems() {
     let addedCount = 0;
     
     lines.forEach(line => {
-        const parts = line.trim().split(/[x×*]\s*/i);
+        // Поддерживаем разные разделители: x, X, ×, *, пробел
+        const parts = line.trim().split(/[\sx×*xX]\s*/i);
         if (parts.length >= 3) {
-            const width = parseFloat(parts[0]);
-            const height = parseFloat(parts[1]);
+            const width = parseInt(parts[0]);
+            const height = parseInt(parts[1]);
             const quantity = parseInt(parts[2]);
             
             if (width > 0 && height > 0 && quantity > 0) {
@@ -1149,8 +1205,26 @@ function processBulkItems() {
         markFormDirty();
         showNotification('success', `Добавлено деталей: ${addedCount}`);
     } else {
-        showNotification('error', 'Не удалось распознать данные. Используйте формат: 300 x 400 x 2');
+        showNotification('error', 'Не удалось распознать данные. Используйте формат: 300 x 400 x 2 (или 300*400*2, 300 400 2)');
     }
+}
+
+// Функция для увеличения/уменьшения значений в числовых полях
+function incrementValue(button, delta) {
+    const input = button.closest('.number-input').querySelector('input');
+    const currentValue = parseInt(input.value) || 0;
+    const newValue = Math.max(parseInt(input.min) || 0, currentValue + delta);
+    const maxValue = parseInt(input.max);
+    
+    if (maxValue && newValue > maxValue) {
+        return;
+    }
+    
+    input.value = newValue;
+    markFormDirty();
+    
+    // Trigger change event
+    input.dispatchEvent(new Event('change'));
 }
 
 function updateItemsCount() {

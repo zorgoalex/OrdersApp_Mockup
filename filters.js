@@ -16,26 +16,33 @@ let allOrders = [];
 // Initialize filters
 function initializeFilters() {
     // Check if demo data is available
-    if (!window.demoData) {
-        console.warn('Demo data not available yet, retrying...');
-        setTimeout(initializeFilters, 100);
+    if (!window.demoData || !window.demoData.helpers || !window.demoData.helpers.getOrdersWithDetails) {
+        console.warn('Demo data not fully available yet, retrying in 200ms...');
+        setTimeout(initializeFilters, 200);
         return;
     }
     
-    allOrders = window.demoData.helpers.getOrdersWithDetails();
-    filteredOrders = [...allOrders];
-    
-    // Populate project filter options
-    populateProjectFilter();
-    
-    // Wait for DOM to be ready before applying filters
-    if (document.readyState === 'loading') {
-        document.addEventListener('DOMContentLoaded', () => {
-            setTimeout(() => applyFilters(), 100);
-        });
-    } else {
-        // DOM is already ready, but wait a bit for other modules
-        setTimeout(() => applyFilters(), 100);
+    try {
+        allOrders = window.demoData.helpers.getOrdersWithDetails();
+        filteredOrders = [...allOrders];
+        
+        console.log('✅ Filters initialized with', allOrders.length, 'orders');
+        
+        // Populate project filter options
+        populateProjectFilter();
+        
+        // Wait for DOM to be ready before applying filters
+        if (document.readyState === 'loading') {
+            document.addEventListener('DOMContentLoaded', () => {
+                setTimeout(() => applyFilters(), 200);
+            });
+        } else {
+            // DOM is already ready, but wait a bit for other modules
+            setTimeout(() => applyFilters(), 200);
+        }
+    } catch (error) {
+        console.error('Error initializing filters:', error);
+        setTimeout(initializeFilters, 500);
     }
 }
 

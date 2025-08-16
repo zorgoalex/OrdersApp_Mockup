@@ -4,19 +4,21 @@
 let currentSortColumn = 'updated_at';
 let currentSortDirection = 'desc';
 let currentPage = 1;
-let itemsPerPage = 10;
+let itemsPerPage = 15; // Увеличиваем до 15 для демонстрации скролла
 let tableData = [];
 
 // Initialize table
 function initializeTable() {
     // Check if demo data is available
-    if (!window.demoData) {
-        console.warn('Demo data not available yet for table initialization');
+    if (!window.demoData || !window.demoData.helpers || !window.demoData.helpers.getOrdersWithDetails) {
+        console.warn('Demo data not available yet for table initialization, retrying...');
+        setTimeout(initializeTable, 200);
         return;
     }
     
     try {
         tableData = window.demoData.helpers.getOrdersWithDetails();
+        console.log('✅ Table initialized with', tableData.length, 'orders');
         
         // Only update table if pagination elements exist
         const paginationContainer = document.getElementById('paginationContainer');
@@ -31,11 +33,14 @@ function initializeTable() {
                 if (container) {
                     updateOrdersTable(tableData);
                     initializePagination();
+                } else {
+                    console.warn('Pagination container still not found, table may not display correctly');
                 }
-            }, 100);
+            }, 300);
         }
     } catch (error) {
         console.error('Error initializing table:', error);
+        setTimeout(initializeTable, 500);
     }
 }
 
@@ -166,8 +171,10 @@ function renderDesktopTable(orders) {
                 </div>
             </td>
             <td class="order-items">
-                <span class="items-count">${order.items_count}</span>
-                ${order.total_quantity ? `<small>(${order.total_quantity} шт.)</small>` : ''}
+                <div class="items-info">
+                    <span class="items-count">${order.items_count} поз.</span>
+                    ${order.total_quantity ? `<small>(${order.total_quantity} шт.)</small>` : ''}
+                </div>
             </td>
             <td class="order-files">
                 <div class="files-info">
@@ -507,7 +514,7 @@ function createPerPageSelect() {
     container.innerHTML = `
         <label for="perPageSelect">Показать:</label>
         <select id="perPageSelect" onchange="changeItemsPerPage(this.value)">
-            <option value="10" ${itemsPerPage === 10 ? 'selected' : ''}>10</option>
+            <option value="15" ${itemsPerPage === 15 ? 'selected' : ''}>15</option>
             <option value="25" ${itemsPerPage === 25 ? 'selected' : ''}>25</option>
             <option value="50" ${itemsPerPage === 50 ? 'selected' : ''}>50</option>
             <option value="100" ${itemsPerPage === 100 ? 'selected' : ''}>100</option>

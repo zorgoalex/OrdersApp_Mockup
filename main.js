@@ -1,4 +1,75 @@
-// Main application module - orchestrates all other modules
+window.removeFile = (fileId) => {
+    if (window.popupsModule?.removeFile) {
+        window.popupsModule.removeFile(fileId);
+    }
+};
+
+window.incrementValue = (button, delta) => {
+    const input = button.closest('.number-input').querySelector('input');
+    const currentValue = parseInt(input.value) || 0;
+    const newValue = Math.max(parseInt(input.min) || 0, currentValue + delta);
+    const maxValue = parseInt(input.max);
+    
+    if (maxValue && newValue > maxValue) {
+        return;
+    }
+    
+    input.value = newValue;
+    
+    // Mark form as dirty if function exists
+    if (window.markFormDirty) {
+        window.markFormDirty();
+    }
+    
+    // Trigger change event
+    input.dispatchEvent(new Event('change'));
+};
+
+// Mobile-specific functions
+window.showMobileOrderMenu = (orderId) => {
+    if (window.tableModule?.showMobileOrderMenu) {
+        window.tableModule.showMobileOrderMenu(orderId);
+    }
+};
+
+window.hideMobileMenu = () => {
+    if (window.tableModule?.hideMobileMenu) {
+        window.tableModule.hideMobileMenu();
+    }
+};
+
+// Development helpers (remove in production)
+if (window.location.hostname === 'localhost' || window.location.hostname === '127.0.0.1') {
+    window.dev = {
+        app,
+        modules: () => app.modules,
+        demoData: () => window.demoData,
+        filters: () => window.filtersModule?.getCurrentFilters(),
+        performance: () => performance.getEntriesByType('navigation')[0],
+        deviceInfo: () => ({
+            isMobile: app.isMobile,
+            isTablet: app.isTablet,
+            width: window.innerWidth,
+            height: window.innerHeight,
+            userAgent: navigator.userAgent
+        }),
+        testNotifications: () => {
+            showNotification('success', 'Тестовое уведомление успеха');
+            setTimeout(() => showNotification('error', 'Тестовое уведомление ошибки'), 1000);
+        },
+        simulateError: () => {
+            throw new Error('Тестовая ошибка для проверки обработчика');
+        },
+        clearWelcome: () => {
+            localStorage.removeItem('woodcraft_welcome_seen');
+            showNotification('success', 'Приветствие сброшено. Обновите страницу.');
+        }
+    };
+    
+    console.log('🔧 Development helpers available in window.dev');
+    console.log('📱 Device type:', app.isMobile ? 'Mobile' : app.isTablet ? 'Tablet' : 'Desktop');
+    console.log('📊 Performance timing available');
+}// Main application module - orchestrates all other modules
 
 // Application state
 let app = {
@@ -105,6 +176,20 @@ async function initializeModules() {
         }
     ];
     
+    // Убеждаемся, что demo data загружены
+    let retries = 0;
+    while ((!window.demoData || !window.demoData.helpers) && retries < 20) {
+        console.log('Waiting for demo data to load...');
+        await new Promise(resolve => setTimeout(resolve, 100));
+        retries++;
+    }
+    
+    if (!window.demoData || !window.demoData.helpers) {
+        throw new Error('Demo data failed to load after 2 seconds');
+    }
+    
+    console.log('✅ Demo data is ready, initializing modules...');
+    
     for (const module of modules) {
         try {
             if (module.init) {
@@ -112,8 +197,8 @@ async function initializeModules() {
                 app.modules[module.name] = true;
                 console.log(`✅ ${module.name} module initialized`);
                 
-                // Small delay between modules to ensure DOM stability
-                await new Promise(resolve => setTimeout(resolve, 50));
+                // Увеличиваем задержку между модулями для стабильности
+                await new Promise(resolve => setTimeout(resolve, 150));
             }
         } catch (error) {
             console.error(`❌ Failed to initialize ${module.name} module:`, error);

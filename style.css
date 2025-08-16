@@ -476,9 +476,31 @@ body {
     display: none;
 }
 
-/* Mobile Cards Layout */
+/* Mobile Cards Layout - показываем только на мобильных */
 .orders-cards {
     display: block;
+}
+
+/* На мобильных скрываем таблицу, показываем карточки */
+@media (max-width: 767px) {
+    .table-wrapper {
+        display: none !important;
+    }
+    
+    .orders-cards {
+        display: block;
+    }
+}
+
+/* На планшетах и десктопах скрываем карточки, показываем таблицу */
+@media (min-width: 768px) {
+    .orders-cards {
+        display: none !important;
+    }
+    
+    .table-wrapper {
+        display: block;
+    }
 }
 
 .order-card {
@@ -1193,14 +1215,7 @@ body {
         font-size: 14px;
     }
     
-    .table-wrapper {
-        display: block;
-        overflow-x: auto;
-    }
-    
-    .orders-cards {
-        display: none;
-    }
+    /* Убираем правила переключения display, так как они уже есть выше */
     
     .orders-table {
         width: 100%;
@@ -1521,6 +1536,7 @@ body {
 .items-section {
     display: grid;
     gap: 16px;
+    position: relative;
 }
 
 .section-header {
@@ -1528,6 +1544,12 @@ body {
     justify-content: space-between;
     align-items: center;
     margin-bottom: 16px;
+    position: sticky;
+    top: 0;
+    background: white;
+    z-index: 5;
+    padding: 10px 0;
+    border-bottom: 1px solid #e2e8f0;
 }
 
 .section-header h4 {
@@ -1538,6 +1560,9 @@ body {
 .items-container {
     display: grid;
     gap: 16px;
+    max-height: 400px;
+    overflow-y: auto;
+    padding-right: 8px;
 }
 
 .item-form {
@@ -1600,12 +1625,63 @@ body {
     gap: 12px;
 }
 
+/* Number input with controls */
+.number-input {
+    position: relative;
+    display: flex;
+}
+
+.number-input input {
+    flex: 1;
+    padding-right: 30px;
+}
+
+.number-controls {
+    position: absolute;
+    right: 2px;
+    top: 2px;
+    bottom: 2px;
+    display: flex;
+    flex-direction: column;
+    width: 26px;
+}
+
+.number-controls button {
+    flex: 1;
+    border: none;
+    background: #f3f4f6;
+    color: #6b7280;
+    cursor: pointer;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 10px;
+    transition: all 0.2s;
+}
+
+.number-controls button:hover {
+    background: #e5e7eb;
+    color: #374151;
+}
+
+.number-controls button:first-child {
+    border-radius: 4px 4px 0 0;
+    border-bottom: 1px solid #d1d5db;
+}
+
+.number-controls button:last-child {
+    border-radius: 0 0 4px 4px;
+}
+
 .bulk-add-section {
     background: #eff6ff;
     border: 1px solid #bfdbfe;
     border-radius: 8px;
     padding: 16px;
     margin-top: 16px;
+    position: sticky;
+    bottom: 0;
+    z-index: 5;
 }
 
 .bulk-add-section h5 {
@@ -1617,11 +1693,60 @@ body {
     font-size: 12px;
     color: #6b7280;
     margin-bottom: 12px;
+    line-height: 1.4;
 }
 
 .bulk-add-section textarea {
     width: 100%;
     margin-bottom: 12px;
+}
+
+/* Sticky form actions */
+.form-actions {
+    position: sticky;
+    bottom: 0;
+    background: white;
+    border-top: 1px solid #e2e8f0;
+    padding: 16px 0;
+    margin: 16px -20px -20px;
+    padding-left: 20px;
+    padding-right: 20px;
+    z-index: 10;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    gap: 16px;
+}
+
+.action-buttons {
+    display: flex;
+    gap: 8px;
+    flex-wrap: wrap;
+}
+
+/* Компактные кнопки для мобильных */
+@media (max-width: 767px) {
+    .action-buttons .btn {
+        min-width: 44px;
+        padding: 12px;
+    }
+    
+    .action-buttons .btn span {
+        display: none;
+    }
+    
+    .action-buttons .btn i {
+        margin: 0;
+    }
+    
+    .section-header .btn {
+        min-width: 44px;
+        padding: 8px;
+    }
+    
+    .section-header .btn span {
+        display: none;
+    }
 }
 
 /* File Upload Styles */
