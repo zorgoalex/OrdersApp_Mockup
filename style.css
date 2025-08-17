@@ -1,6 +1,9 @@
 /* Mobile-first CSS Design */
 
 /* Reset and Base Styles */
+:root {
+    --modal-header-h: 60px;
+}
 * {
     margin: 0;
     padding: 0;
@@ -132,7 +135,7 @@ body {
     box-shadow: 0 10px 25px rgba(0, 0, 0, 0.1);
     min-width: 180px;
     display: none;
-    z-index: 200;
+  z-index: 200;
 }
 
 .user-dropdown.show {
@@ -810,6 +813,10 @@ body {
     align-items: center;
     padding: 16px 20px;
     border-bottom: 1px solid #e2e8f0;
+    position: sticky;
+    top: 0;
+    z-index: 30;
+    background: #fff;
 }
 
 .modal-header h3 {
@@ -1023,7 +1030,7 @@ body {
     border: none;
     color: inherit;
     cursor: pointer;
-    margin-left: auto;
+  margin-left: auto;
     padding: 4px;
 }
 
@@ -1462,6 +1469,9 @@ body {
     font-weight: 600;
     color: #374151;
     font-size: 12px;
+    position: sticky;
+    top: var(--modal-header-h);
+    z-index: 20;
 }
 
 .item-size {
@@ -1609,8 +1619,8 @@ body {
 
 .size-group {
     display: grid;
-    grid-template-columns: 1fr 1fr 1fr;
-    gap: 12px;
+    grid-template-columns: repeat(3, minmax(120px, 1fr));
+    gap: 8px;
 }
 
 .material-group {
@@ -1629,12 +1639,19 @@ body {
 .number-input {
     position: relative;
     display: flex;
+    width: 100%;
 }
 
 .number-input input {
     flex: 1;
-    padding-right: 30px;
+    padding-right: 26px;
+    height: 36px;
 }
+
+/* Hide native number spinners to avoid overflow (we use custom controls) */
+input[type="number"] { -moz-appearance: textfield; appearance: textfield; }
+input[type="number"]::-webkit-outer-spin-button,
+input[type="number"]::-webkit-inner-spin-button { -webkit-appearance: none; margin: 0; }
 
 .number-controls {
     position: absolute;
@@ -1798,11 +1815,14 @@ body {
         grid-template-columns: 1fr;
     }
     
-    .size-group,
+    /* Размеры и количество в одну линию на мобильном */
+    /* В одну линию и без переполнения даже на узких экранах */
+    .size-group { grid-template-columns: repeat(3, 1fr); gap: 6px; }
+    .number-input input { height: 30px; padding-right: 22px; }
+    .number-controls { width: 22px; right: 1px; top: 1px; bottom: 1px; }
+    /* Остальные группы остаются по одной колонке */
     .material-group,
-    .finish-group {
-        grid-template-columns: 1fr;
-    }
+    .finish-group { grid-template-columns: 1fr; }
     
     .items-table {
         font-size: 12px;

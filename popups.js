@@ -545,6 +545,47 @@ function initializeOrderForm(order = null) {
     if (!order) {
         addNewItem();
     }
+
+    // Update CSS var for sticky header height
+    const header = document.querySelector('#orderFormModal .modal-header');
+    if (header) {
+        const h = header.getBoundingClientRect().height;
+        document.documentElement.style.setProperty('--modal-header-h', h + 'px');
+    }
+
+    // Ensure bulk section with action button is visible when focusing textarea
+    const bulkInput = document.getElementById('bulkItemsInput');
+    const bulkSection = document.querySelector('.bulk-add-section');
+    if (bulkInput && bulkSection) {
+        const reveal = () => {
+            setTimeout(() => {
+                // Scroll to show the entire bulk section with button at top
+                bulkSection.scrollIntoView({ 
+                    behavior: 'smooth', 
+                    block: 'start',
+                    inline: 'nearest'
+                });
+                
+                // Additional check for mobile devices - ensure button is visible
+                if (window.innerWidth < 768) {
+                    setTimeout(() => {
+                        const addButton = bulkSection.querySelector('button');
+                        if (addButton) {
+                            const rect = addButton.getBoundingClientRect();
+                            if (rect.bottom > window.innerHeight || rect.top < 0) {
+                                addButton.scrollIntoView({ 
+                                    behavior: 'smooth', 
+                                    block: 'center'
+                                });
+                            }
+                        }
+                    }, 300);
+                }
+            }, 100);
+        };
+        bulkInput.addEventListener('focus', reveal, { passive: true });
+        bulkInput.addEventListener('click', reveal, { passive: true });
+    }
 }
 
 // Switch form tabs
@@ -787,6 +828,11 @@ function updateDemoOrder(orderData) {
                 ...orderData,
                 is_editable: orderData.status_code === 'draft' || orderData.status_code === 'revision'
             };
+            // Recompute computed props for table
+            const o = window.demoData.orders[orderIndex];
+            o.items_count = o.items ? o.items.length : 0;
+            o.files_count = o.files ? o.files.length : 0;
+            o.total_quantity = o.items ? o.items.reduce((s,i)=> s + (parseInt(i.quantity)||0), 0) : 0;
         }
     } else {
         // Create new order
@@ -1003,12 +1049,16 @@ function addNewItem() {
     const itemsContainer = document.getElementById('itemsContainer');
     if (!itemsContainer) return;
     
+    const nextNumber = itemsContainer.querySelectorAll('.item-form').length + 1;
     const itemId = 'item_' + Date.now();
-    const itemHtml = renderItemForm({ id: itemId });
+    const itemHtml = renderItemForm({ id: itemId, _number: nextNumber });
     
     const itemElement = document.createElement('div');
     itemElement.innerHTML = itemHtml;
-    itemsContainer.appendChild(itemElement.firstElementChild);
+    const newNode = itemElement.firstElementChild;
+    itemsContainer.appendChild(newNode);
+    // Scroll new item into view
+    newNode?.scrollIntoView({ behavior: 'smooth', block: 'start' });
     
     updateItemsCount();
     markFormDirty();
@@ -1025,12 +1075,14 @@ function removeItem(itemId) {
 
 function addItemToForm(item) {
     const itemsContainer = document.getElementById('itemsContainer');
-    if (!itemsContainer) return;
-    
-    const itemHtml = renderItemForm(item);
+    if (!itemsContainer) return null;
+    const nextNumber = itemsContainer.querySelectorAll('.item-form').length + 1;
+    const itemHtml = renderItemForm({ ...item, _number: item._number || nextNumber });
     const itemElement = document.createElement('div');
     itemElement.innerHTML = itemHtml;
-    itemsContainer.appendChild(itemElement.firstElementChild);
+    const newNode = itemElement.firstElementChild;
+    itemsContainer.appendChild(newNode);
+    return newNode;
 }
 
 function renderItemForm(item = {}) {
@@ -1042,7 +1094,7 @@ function renderItemForm(item = {}) {
     return `
         <div class="item-form" data-item-id="${item.id || ''}">
             <div class="item-header">
-                <h5>Деталь ${item.id ? '#' + (item.id.split('_')[1] || '1') : '#' + Date.now()}</h5>
+                <h5>Деталь №${item._number || 1}</h5>
                 <button type="button" class="btn-remove" onclick="removeItem('${item.id || ''}')">
                     <i class="fas fa-times"></i>
                 </button>
@@ -1176,16 +1228,21 @@ function processBulkItems() {
     
     const lines = textarea.value.split('\n').filter(line => line.trim());
     let addedCount = 0;
+    let lastNew = null;
     
     lines.forEach(line => {
         // Поддерживаем разные разделители: x, X, ×, *, пробел
-        const parts = line.trim().split(/[\sx×*xX]\s*/i);
+        const parts = line.trim().split(/[x×*\s]+/i).filter(Boolean);
         if (parts.length >= 3) {
-            const width = parseInt(parts[0]);
-            const height = parseInt(parts[1]);
-            const quantity = parseInt(parts[2]);
-            
-            if (width > 0 && height > 0 && quantity > 0) {
+            const width = Math.round(parseFloat(parts[0]));
+            const height = Math.round(parseFloat(parts[1]));
+            const quantity = Math.round(parseFloat(parts[2]));
+
+            const isValid = (v,min,max)=> Number.isFinite(v) && v>=min && v<=max;
+            const dimsOk = isValid(width,20,2800) && isValid(height,20,2800) && !(width>2070 && height>2070);
+            const qtyOk = Number.isInteger(quantity) && quantity>=1 && quantity<=9999;
+
+            if (dimsOk && qtyOk) {
                 const item = {
                     id: 'item_' + Date.now() + '_' + addedCount,
                     width,
@@ -1193,8 +1250,10 @@ function processBulkItems() {
                     quantity,
                     finish_code: 'raw'
                 };
-                addItemToForm(item);
+                lastNew = addItemToForm(item) || lastNew;
                 addedCount++;
+            } else {
+                console.warn('Invalid line skipped:', line);
             }
         }
     });
@@ -1204,8 +1263,10 @@ function processBulkItems() {
         updateItemsCount();
         markFormDirty();
         showNotification('success', `Добавлено деталей: ${addedCount}`);
+        // Scroll to the last newly added item
+        lastNew?.scrollIntoView({ behavior: 'smooth', block: 'start' });
     } else {
-        showNotification('error', 'Не удалось распознать данные. Используйте формат: 300 x 400 x 2 (или 300*400*2, 300 400 2)');
+        showNotification('error', 'Не удалось распознать данные или размеры некорректны. Формат: 300 x 400 x 2 (20..2800 мм; не более одного измерения > 2070; количество ≥ 1)');
     }
 }
 
@@ -1376,6 +1437,13 @@ window.popupsModule = {
     unarchiveOrder,
     downloadFile,
     saveOrder,
-    submitOrderFromForm
+    submitOrderFromForm,
+    // expose item/file handlers for main.js bridges
+    addNewItem,
+    removeItem,
+    addItemToForm,
+    processBulkItems,
+    removeFile,
+    markFormDirty
 };
     
