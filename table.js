@@ -533,10 +533,20 @@ function updatePagination(totalItems) {
     const totalPages = Math.ceil(totalItems / itemsPerPage);
     const paginationInfo = document.getElementById('paginationInfo');
     const pagination = document.getElementById('pagination');
+    const paginationContainer = document.getElementById('paginationContainer');
     
     if (!pagination || !paginationInfo) {
         console.warn('Pagination elements not found, skipping pagination update');
         return;
+    }
+    
+    // Show/hide sticky pagination based on total items
+    if (paginationContainer) {
+        if (totalItems > 15) {
+            paginationContainer.classList.add('sticky-pagination');
+        } else {
+            paginationContainer.classList.remove('sticky-pagination');
+        }
     }
     
     // Update info
