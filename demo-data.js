@@ -823,6 +823,92 @@ const demoOrders = [
     }
 ];
 
+// ---- Auto-extend demo dataset to required scale ----
+// Target: total 30 orders, 5 archived, 10 orders with >= 30 items
+
+// Helper to generate N demo items
+function genItems(count){
+    const res = [];
+    for(let i=0;i<count;i++){
+        const finish = (i % 3 === 0) ? 'raw' : (i % 3 === 1 ? 'film' : 'paint');
+        const item = {
+            id: `gitem_${i}_${Math.random().toString(36).slice(2,8)}`,
+            width: 300 + (i % 100) * 10,
+            height: 200 + (i % 80) * 10,
+            quantity: 1 + (i % 3),
+            material_id: materials[i % materials.length].id,
+            milling_type_id: millingTypes[i % millingTypes.length].id,
+            finish_code: finish,
+            film_id: finish === 'film' ? films[i % films.length].id : null,
+            paint_id: finish === 'paint' ? paints[i % paints.length].id : null,
+            note: ''
+        };
+        res.push(item);
+    }
+    return res;
+}
+
+(function(){
+    const REQUIRED_TOTAL = 30;
+    const REQUIRED_ARCHIVED = 5;
+    const REQUIRED_LARGE = 10; // orders with >=30 items
+
+    // Add generated orders until reach REQUIRED_TOTAL
+    let nextIdx = demoOrders.length + 1; // continue numbering
+    let largeStillNeeded = Math.max(0, REQUIRED_LARGE - demoOrders.filter(o=>o.items && o.items.length >= 30).length);
+
+    while(demoOrders.length < REQUIRED_TOTAL){
+        const makeLarge = largeStillNeeded > 0;
+        const id = `order${nextIdx}`;
+        demoOrders.push({
+            id,
+            order_no: `W-2025-${String(nextIdx).padStart(3,'0')}`,
+            prefix: 'W',
+            client_id: 'client1',
+            project_id: projects[(nextIdx-1) % projects.length]?.id || null,
+            name: `Сгенерированный заказ ${nextIdx}`,
+            note: '',
+            status_code: 'draft',
+            is_archived: false,
+            archived_at: null,
+            submitted_at: null,
+            approved_at: null,
+            version: 1,
+            created_at: '2025-02-18T12:00:00Z',
+            updated_at: '2025-02-18T12:00:00Z',
+            items: genItems(makeLarge ? 30 : 6),
+            files: []
+        });
+        if(makeLarge) largeStillNeeded--;
+        nextIdx++;
+    }
+
+    // Ensure at least REQUIRED_LARGE orders have >=30 items
+    let haveLarge = demoOrders.filter(o=>o.items && o.items.length>=30).length;
+    if(haveLarge < REQUIRED_LARGE){
+        for(const o of demoOrders){
+            if(haveLarge >= REQUIRED_LARGE) break;
+            if((o.items?.length||0) < 30){
+                const toAdd = 30 - o.items.length;
+                o.items = o.items.concat(genItems(toAdd).map((it,idx)=>({ ...it, id: `${o.id}_x${idx}` })));
+                haveLarge++;
+            }
+        }
+    }
+
+    // Ensure REQUIRED_ARCHIVED archived orders
+    let archivedCount = demoOrders.filter(o=>o.is_archived).length;
+    for(let i=demoOrders.length-1; i>=0 && archivedCount < REQUIRED_ARCHIVED; i--){
+        const o = demoOrders[i];
+        if(!o.is_archived){
+            o.is_archived = true;
+            o.status_code = 'approved';
+            o.archived_at = '2025-02-19T10:00:00Z';
+            archivedCount++;
+        }
+    }
+})();
+
 // Export data for use in other modules - перемещаем в начало
 window.demoData = {
     orders: [], // Временно пустой массив
