@@ -1015,6 +1015,56 @@ window.closeModal = (id) => window.popupsModule?.closeModal(id);
 window.showNotification = (type, message, duration) => window.popupsModule?.showNotification(type, message, duration);
 window.hideNotification = (id) => window.popupsModule?.hideNotification(id);
 
+// Status filter from stat cards
+window.filterByStatusCard = (status) => {
+    if (window.filtersModule?.filterByStatus) {
+        // Update visual state of stat cards
+        updateStatCardStates(status);
+        
+        // Apply filter using the original function
+        window.filtersModule.filterByStatus(status);
+        
+        // Close filters panel if open
+        window.filtersModule.hideFilters();
+        
+        // Show notification
+        const statusLabels = {
+            'draft': 'черновики',
+            'submitted': 'заказы на проверке',
+            'approved': 'принятые заказы',
+            'revision': 'заказы на доработку'
+        };
+        
+        window.showNotification('success', `Показаны ${statusLabels[status] || 'заказы'}`, 2000);
+    }
+};
+
+// Update visual state of stat cards
+function updateStatCardStates(activeStatus) {
+    const statCards = document.querySelectorAll('.stat-card[data-status]');
+    
+    statCards.forEach(card => {
+        const cardStatus = card.getAttribute('data-status');
+        
+        if (cardStatus === activeStatus) {
+            card.classList.add('active');
+        } else {
+            card.classList.remove('active');
+        }
+    });
+}
+
+// Make function available globally
+window.updateStatCardStates = updateStatCardStates;
+
+// Clear stat card states when filters are reset
+window.clearStatCardStates = () => {
+    const statCards = document.querySelectorAll('.stat-card[data-status]');
+    statCards.forEach(card => {
+        card.classList.remove('active');
+    });
+};
+
 // Functions for form handling
 window.switchTab = (tabName) => {
     // Update tab buttons

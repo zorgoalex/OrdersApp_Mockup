@@ -34,11 +34,17 @@ function initializeFilters() {
         // Wait for DOM to be ready before applying filters
         if (document.readyState === 'loading') {
             document.addEventListener('DOMContentLoaded', () => {
-                setTimeout(() => applyFilters(), 200);
+                setTimeout(() => {
+                    applyFilters();
+                    updateStats(); // Обновляем статистику при инициализации
+                }, 200);
             });
         } else {
             // DOM is already ready, but wait a bit for other modules
-            setTimeout(() => applyFilters(), 200);
+            setTimeout(() => {
+                applyFilters();
+                updateStats(); // Обновляем статистику при инициализации
+            }, 200);
         }
     } catch (error) {
         console.error('Error initializing filters:', error);
@@ -155,7 +161,10 @@ function applyFilters() {
     // Update UI
     updateOrdersDisplay();
     updateFilterIndicators();
-    updateStats();
+    updateStats(); // Обновляем статистику после применения фильтров
+    
+    // Update stat card states to reflect current status filter
+    updateStatCardsFromFilter();
 }
 
 // Reset all filters
@@ -179,6 +188,11 @@ function resetFilters() {
     const clearButton = document.querySelector('.clear-search');
     if (clearButton) {
         clearButton.style.display = 'none';
+    }
+    
+    // Clear stat card states
+    if (window.clearStatCardStates) {
+        window.clearStatCardStates();
     }
     
     // Apply filters
@@ -269,6 +283,12 @@ function updateFilterIndicators() {
                 badge.remove();
             }
         }
+    }
+    
+    // Update reset button visibility
+    const resetButton = document.getElementById('resetFiltersBtn');
+    if (resetButton) {
+        resetButton.style.display = hasActiveFilters ? 'inline-flex' : 'none';
     }
 }
 
@@ -364,21 +384,28 @@ function getFilterSuffix() {
     return activeFilters.length > 0 ? ` (${activeFilters.join(', ')})` : '';
 }
 
-// Update statistics
+// Update statistics - ALWAYS based on ALL orders, not filtered
 function updateStats() {
-    const stats = window.demoData.helpers.getOrdersStats(filteredOrders);
+    // Calculate stats from ALL orders, not filtered ones
+    const stats = window.demoData.helpers.getOrdersStats(allOrders);
     
     // Update stat cards
     const updateStatCard = (id, value) => {
         const element = document.getElementById(id);
         if (element) {
+            // Get current value before updating
+            const currentValue = parseInt(element.textContent) || 0;
+            
+            // Update the value
             element.textContent = value;
             
-            // Add animation
-            element.style.transform = 'scale(1.1)';
-            setTimeout(() => {
-                element.style.transform = 'scale(1)';
-            }, 150);
+            // Add animation only if value changed
+            if (currentValue !== value) {
+                element.style.transform = 'scale(1.1)';
+                setTimeout(() => {
+                    element.style.transform = 'scale(1)';
+                }, 150);
+            }
         }
     };
     
@@ -482,12 +509,40 @@ const filterStyles = `
     .stat-number {
         transition: transform 0.15s ease;
     }
+    
+    .btn-reset {
+        border-color: #dc2626 !important;
+        color: #dc2626 !important;
+        background: #fef2f2 !important;
+        transition: all 0.2s ease;
+    }
+    
+    .btn-reset:hover {
+        background: #dc2626 !important;
+        color: white !important;
+        transform: translateY(-1px);
+    }
+    
+    .btn-reset:active {
+        transform: translateY(0);
+    }
 `;
 
 // Inject styles
 const styleSheet = document.createElement('style');
 styleSheet.textContent = filterStyles;
 document.head.appendChild(styleSheet);
+
+// Update stat card states based on current filter
+function updateStatCardsFromFilter() {
+    if (window.updateStatCardStates) {
+        if (currentFilters.status) {
+            window.updateStatCardStates(currentFilters.status);
+        } else {
+            window.clearStatCardStates();
+        }
+    }
+}
 
 // Export functions for global access
 window.filtersModule = {
@@ -504,5 +559,6 @@ window.filtersModule = {
     searchByOrderNumber,
     searchByProjectName,
     getFilteredOrders,
-    getCurrentFilters
+    getCurrentFilters,
+    updateStats
 };

@@ -67,6 +67,10 @@
                         <i class="fas fa-filter"></i>
                         Фильтры
                     </button>
+                    <button class="btn btn-secondary btn-reset" id="resetFiltersBtn" onclick="resetFilters()" title="Сбросить все фильтры" style="display: none;">
+                        <i class="fas fa-times"></i>
+                        Сбросить
+                    </button>
                     <button class="btn btn-primary" onclick="createNewOrder()">
                         <i class="fas fa-plus"></i>
                         Новый заказ
@@ -76,7 +80,7 @@
 
             <!-- Quick Stats -->
             <div class="stats-grid">
-                <div class="stat-card">
+                <div class="stat-card clickable" data-status="draft" onclick="filterByStatusCard('draft')" title="Фильтровать черновики">
                     <div class="stat-icon draft">
                         <i class="fas fa-edit"></i>
                     </div>
@@ -85,7 +89,7 @@
                         <div class="stat-label">Черновики</div>
                     </div>
                 </div>
-                <div class="stat-card">
+                <div class="stat-card clickable" data-status="submitted" onclick="filterByStatusCard('submitted')" title="Фильтровать на проверке">
                     <div class="stat-icon submitted">
                         <i class="fas fa-clock"></i>
                     </div>
@@ -94,7 +98,7 @@
                         <div class="stat-label">На проверке</div>
                     </div>
                 </div>
-                <div class="stat-card">
+                <div class="stat-card clickable" data-status="approved" onclick="filterByStatusCard('approved')" title="Фильтровать принятые">
                     <div class="stat-icon approved">
                         <i class="fas fa-check-circle"></i>
                     </div>
@@ -103,7 +107,7 @@
                         <div class="stat-label">Принято</div>
                     </div>
                 </div>
-                <div class="stat-card">
+                <div class="stat-card clickable" data-status="revision" onclick="filterByStatusCard('revision')" title="Фильтровать на доработку">
                     <div class="stat-icon revision">
                         <i class="fas fa-undo"></i>
                     </div>
