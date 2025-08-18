@@ -136,6 +136,9 @@ function detectDeviceType() {
     document.body.classList.toggle('mobile', app.isMobile);
     document.body.classList.toggle('tablet', app.isTablet);
     document.body.classList.toggle('desktop', !app.isMobile && !app.isTablet);
+    
+    // Add user role class to body
+    document.body.classList.add(`${app.currentUser.role}-role`);
 }
 
 // Initialize all modules
