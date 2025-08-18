@@ -1106,6 +1106,12 @@ window.processBulkItems = () => {
     }
 };
 
+window.toggleBulkForm = () => {
+    if (window.popupsModule?.toggleBulkForm) {
+        window.popupsModule.toggleBulkForm();
+    }
+};
+
 window.removeFile = (fileId) => {
     if (window.popupsModule?.removeFile) {
         window.popupsModule.removeFile(fileId);

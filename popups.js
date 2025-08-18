@@ -430,25 +430,41 @@ function renderOrderForm(order = null) {
                     <div class="items-section">
                         <div class="section-header">
                             <h4>Детали заказа</h4>
-                            <button type="button" class="btn btn-primary btn-sm" onclick="addNewItem()">
-                                <i class="fas fa-plus"></i>
-                                <span>Добавить деталь</span>
-                            </button>
+                            <div class="header-buttons">
+                                <button type="button" class="btn btn-primary btn-sm" onclick="addNewItem()">
+                                    <i class="fas fa-plus"></i>
+                                    <span>Добавить деталь</span>
+                                </button>
+                                <button type="button" class="btn btn-secondary btn-sm bulk-toggle-button" onclick="toggleBulkForm()" title="Массовое добавление">
+                                    <span class="bulk-icon">++</span>
+                                </button>
+                            </div>
                         </div>
                         <div class="items-container" id="itemsContainer">
                             <!-- Items will be populated by JavaScript -->
                         </div>
-                        <div class="bulk-add-section">
-                            <h5>Массовое добавление</h5>
+                        
+                        <div class="bulk-form-section" id="bulkFormSection" style="display: none;">
+                            <div class="bulk-form-header">
+                                <h5>Массовое добавление деталей</h5>
+                                <button type="button" class="btn btn-text btn-sm" onclick="toggleBulkForm()" title="Закрыть">
+                                    <i class="fas fa-times"></i>
+                                </button>
+                            </div>
                             <p class="help-text">Вставьте строки в формате: Ширина x Высота x Количество<br>
                             Поддерживаемые разделители: x, ×, *, пробел<br>
                             Примеры: 300 x 400 x 2, 500*300*1, 800 600 3</p>
                             <textarea id="bulkItemsInput" rows="4" 
                                       placeholder="300 x 400 x 2&#10;500 * 300 * 1&#10;800 600 3"></textarea>
-                            <button type="button" class="btn btn-secondary btn-sm" onclick="processBulkItems()">
-                                <i class="fas fa-plus-circle"></i>
-                                Добавить из текста
-                            </button>
+                            <div class="bulk-form-actions">
+                                <button type="button" class="btn btn-secondary" onclick="toggleBulkForm()">
+                                    Отмена
+                                </button>
+                                <button type="button" class="btn btn-primary" onclick="processBulkItems()">
+                                    <i class="fas fa-plus-circle"></i>
+                                    Добавить из текста
+                                </button>
+                            </div>
                         </div>
                     </div>
                 </div>
@@ -547,38 +563,13 @@ function initializeOrderForm(order = null) {
         document.documentElement.style.setProperty('--modal-header-h', h + 'px');
     }
 
-    // Ensure bulk section with action button is visible when focusing textarea
-    const bulkInput = document.getElementById('bulkItemsInput');
-    const bulkSection = document.querySelector('.bulk-add-section');
-    if (bulkInput && bulkSection) {
-        const reveal = () => {
-            setTimeout(() => {
-                // Scroll to show the entire bulk section with button at top
-                bulkSection.scrollIntoView({ 
-                    behavior: 'smooth', 
-                    block: 'start',
-                    inline: 'nearest'
-                });
-                
-                // Additional check for mobile devices - ensure button is visible
-                if (window.innerWidth < 768) {
-                    setTimeout(() => {
-                        const addButton = bulkSection.querySelector('button');
-                        if (addButton) {
-                            const rect = addButton.getBoundingClientRect();
-                            if (rect.bottom > window.innerHeight || rect.top < 0) {
-                                addButton.scrollIntoView({ 
-                                    behavior: 'smooth', 
-                                    block: 'center'
-                                });
-                            }
-                        }
-                    }, 300);
-                }
-            }, 100);
-        };
-        bulkInput.addEventListener('focus', reveal, { passive: true });
-        bulkInput.addEventListener('click', reveal, { passive: true });
+    // Initialize bulk form as hidden by default
+    const bulkFormSection = document.getElementById('bulkFormSection');
+    const bulkToggleButton = document.querySelector('.bulk-toggle-button');
+    if (bulkFormSection && bulkToggleButton) {
+        // Start hidden
+        bulkFormSection.style.display = 'none';
+        bulkToggleButton.classList.remove('active');
     }
 }
 
@@ -1282,6 +1273,46 @@ function handleFinishChange(select) {
     markFormDirty();
 }
 
+// Toggle bulk form visibility
+function toggleBulkForm() {
+    const formSection = document.getElementById('bulkFormSection');
+    const toggleButton = document.querySelector('.bulk-toggle-button');
+    
+    if (!formSection || !toggleButton) return;
+    
+    const isVisible = formSection.style.display !== 'none';
+    
+    if (isVisible) {
+        // Hide form
+        formSection.style.display = 'none';
+        toggleButton.classList.remove('active');
+        
+        // Clear textarea when hiding
+        const textarea = document.getElementById('bulkItemsInput');
+        if (textarea) {
+            textarea.value = '';
+        }
+    } else {
+        // Show form
+        formSection.style.display = 'block';
+        toggleButton.classList.add('active');
+        
+        // Focus on textarea when showing
+        setTimeout(() => {
+            const textarea = document.getElementById('bulkItemsInput');
+            if (textarea) {
+                textarea.focus();
+            }
+            
+            // Scroll to form
+            formSection.scrollIntoView({ 
+                behavior: 'smooth', 
+                block: 'nearest'
+            });
+        }, 50);
+    }
+}
+
 function processBulkItems() {
     const textarea = document.getElementById('bulkItemsInput');
     if (!textarea) return;
@@ -1323,8 +1354,14 @@ function processBulkItems() {
         updateItemsCount();
         markFormDirty();
         showNotification('success', `Добавлено деталей: ${addedCount}`);
+        
+        // Hide bulk form after successful addition
+        toggleBulkForm();
+        
         // Scroll to the last newly added item
-        lastNew?.scrollIntoView({ behavior: 'smooth', block: 'start' });
+        setTimeout(() => {
+            lastNew?.scrollIntoView({ behavior: 'smooth', block: 'start' });
+        }, 100);
     } else {
         showNotification('error', 'Не удалось распознать данные или размеры некорректны. Формат: 300 x 400 x 2 (20..2800 мм; не более одного измерения > 2070; количество ≥ 1)');
     }
@@ -1506,6 +1543,7 @@ window.popupsModule = {
     removeItem,
     addItemToForm,
     processBulkItems,
+    toggleBulkForm,
     removeFile,
     markFormDirty
 };
