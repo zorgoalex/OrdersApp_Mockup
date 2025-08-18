@@ -580,9 +580,9 @@ body {
 }
 
 .order-number {
-    font-weight: 600;
-    color: #1e293b;
-    font-size: 16px;
+    font-weight: 400;
+    color: #9ca3af;
+    font-size: 12px;
     display: flex;
     align-items: center;
     gap: 8px;
@@ -1374,6 +1374,12 @@ body {
         display: flex;
         align-items: center;
         gap: 8px;
+    }
+    
+    .orders-table .order-number {
+        font-size: 14px;
+        font-weight: 400;
+        color: #9ca3af;
     }
     
     .order-name-content {
