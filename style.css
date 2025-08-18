@@ -1481,6 +1481,13 @@ body {
     max-width: 100%;
 }
 
+/* Ensure sticky headers work properly in modal */
+#orderDetailsModal .items-table th {
+    background: #f8fafc;
+    backdrop-filter: blur(10px);
+    box-shadow: 0 1px 3px rgba(0,0,0,0.1);
+}
+
 .revision-alert {
     background: #fee2e2;
     border: 1px solid #fca5a5;
@@ -1546,6 +1553,10 @@ body {
 
 .items-table {
     overflow-x: auto;
+    max-height: calc(60vh - 100px);
+    overflow-y: auto;
+    border: 1px solid #e5e7eb;
+    border-radius: 6px;
 }
 
 .items-table table {
@@ -1567,8 +1578,9 @@ body {
     color: #374151;
     font-size: 12px;
     position: sticky;
-    top: var(--modal-header-h);
+    top: 0;
     z-index: 20;
+    border-bottom: 2px solid #e5e7eb !important;
 }
 
 .item-size {
