@@ -103,7 +103,8 @@ function applyFilters() {
     currentFilters.dateRange = document.getElementById('dateFilter').value;
     currentFilters.showArchived = document.getElementById('showArchived').checked;
     
-    // Start with all orders
+    // Start with all orders (always get fresh data)
+    allOrders = window.demoData.helpers.getOrdersWithDetails();
     filteredOrders = [...allOrders];
     
     // Apply status filter

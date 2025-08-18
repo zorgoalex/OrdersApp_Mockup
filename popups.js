@@ -1005,7 +1005,7 @@ function archiveOrder(orderId) {
             
             showNotification('success', 'Заказ перемещен в архив');
             
-            // Refresh table
+            // Refresh table and filters - applyFilters() already calls updateOrdersTable()
             if (window.filtersModule?.applyFilters) {
                 window.filtersModule.applyFilters();
             }
@@ -1026,7 +1026,7 @@ function unarchiveOrder(orderId) {
     
     showNotification('success', 'Заказ восстановлен из архива');
     
-    // Refresh table
+    // Refresh table and filters - applyFilters() already calls updateOrdersTable()
     if (window.filtersModule?.applyFilters) {
         window.filtersModule.applyFilters();
     }
