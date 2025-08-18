@@ -57,13 +57,7 @@ function closeModal(modalId) {
     
     // Check for unsaved changes
     if (isFormDirty && modalId === 'orderFormModal') {
-        showConfirmation(
-            'Несохраненные изменения',
-            'У вас есть несохраненные изменения. Закрыть форму без сохранения?',
-            () => {
-                forceCloseModal(modalId);
-            }
-        );
+        showSaveConfirmation(modalId);
         return;
     }
     
@@ -613,6 +607,14 @@ function showConfirmation(title, message, onConfirm, onCancel = null) {
     document.getElementById('confirmTitle').textContent = title;
     document.getElementById('confirmMessage').textContent = message;
     
+    // Restore default button layout
+    const modal = document.getElementById('confirmModal');
+    const actionsContainer = modal.querySelector('.modal-actions');
+    actionsContainer.innerHTML = `
+        <button class="btn btn-secondary" onclick="closeModal('confirmModal')">Отмена</button>
+        <button class="btn btn-primary" id="confirmAction">Подтвердить</button>
+    `;
+    
     const confirmButton = document.getElementById('confirmAction');
     confirmButton.onclick = () => {
         closeModal('confirmModal');
@@ -620,7 +622,6 @@ function showConfirmation(title, message, onConfirm, onCancel = null) {
     };
     
     // Update cancel button
-    const modal = document.getElementById('confirmModal');
     const cancelButton = modal.querySelector('.btn-secondary');
     cancelButton.onclick = () => {
         closeModal('confirmModal');
@@ -628,6 +629,65 @@ function showConfirmation(title, message, onConfirm, onCancel = null) {
     };
     
     openModal('confirmModal');
+}
+
+// Show save confirmation with "Save and Close" option
+function showSaveConfirmation(modalId) {
+    document.getElementById('confirmTitle').textContent = 'Несохраненные изменения';
+    document.getElementById('confirmMessage').textContent = 'У вас есть несохраненные изменения. Что вы хотите сделать?';
+    
+    // Get the modal actions container
+    const modal = document.getElementById('confirmModal');
+    const actionsContainer = modal.querySelector('.modal-actions');
+    
+    // Replace buttons with three options
+    actionsContainer.innerHTML = `
+        <button class="btn btn-secondary" onclick="closeModal('confirmModal')">Отмена</button>
+        <button class="btn btn-warning" onclick="forceCloseWithoutSave('${modalId}')">Закрыть без сохранения</button>
+        <button class="btn btn-primary" onclick="saveAndClose('${modalId}')">Сохранить и закрыть</button>
+    `;
+    
+    openModal('confirmModal');
+}
+
+// Force close without saving
+function forceCloseWithoutSave(modalId) {
+    closeModal('confirmModal');
+    forceCloseModal(modalId);
+}
+
+// Save and close
+function saveAndClose(modalId) {
+    closeModal('confirmModal');
+    
+    // Save the order first, then close modal
+    if (modalId === 'orderFormModal') {
+        if (!validateOrderForm()) {
+            return;
+        }
+        
+        updateSaveStatus('saving');
+        
+        // Collect form data
+        const orderData = collectFormData();
+        
+        setTimeout(() => {
+            isFormDirty = false;
+            updateSaveStatus('saved');
+            showNotification('success', 'Заказ сохранен');
+            
+            // Update demo data
+            updateDemoOrder(orderData);
+            
+            // Refresh table
+            if (window.filtersModule?.applyFilters) {
+                window.filtersModule.applyFilters();
+            }
+            
+            // Close the modal after saving
+            forceCloseModal(modalId);
+        }, 1000);
+    }
 }
 
 // Show notification
@@ -1429,6 +1489,9 @@ window.popupsModule = {
     createNewOrder,
     editOrder,
     showConfirmation,
+    showSaveConfirmation,
+    forceCloseWithoutSave,
+    saveAndClose,
     showNotification,
     hideNotification,
     submitOrder,

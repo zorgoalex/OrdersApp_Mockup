@@ -1015,6 +1015,8 @@ window.duplicateOrder = (id) => window.popupsModule?.duplicateOrder(id);
 window.archiveOrder = (id) => window.popupsModule?.archiveOrder(id);
 window.unarchiveOrder = (id) => window.popupsModule?.unarchiveOrder(id);
 window.closeModal = (id) => window.popupsModule?.closeModal(id);
+window.forceCloseWithoutSave = (modalId) => window.popupsModule?.forceCloseWithoutSave(modalId);
+window.saveAndClose = (modalId) => window.popupsModule?.saveAndClose(modalId);
 window.showNotification = (type, message, duration) => window.popupsModule?.showNotification(type, message, duration);
 window.hideNotification = (id) => window.popupsModule?.hideNotification(id);
 
