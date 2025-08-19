@@ -135,59 +135,71 @@ function renderOrderDetails(order) {
                 </div>
             ` : ''}
             
-            <div class="details-grid">
-                <div class="detail-group">
-                    <label>Номер заказа</label>
-                    <div class="detail-value">${order.order_no}</div>
-                </div>
-                
-                <div class="detail-group">
-                    <label>Название</label>
-                    <div class="detail-value ${isEditable ? 'editable-field' : ''}" 
-                         data-field="name" 
-                         data-value="${order.name}"
-                         ${isEditable ? 'title="Двойной клик для редактирования"' : ''}>${order.name}</div>
-                </div>
-                
-                <div class="detail-group">
-                    <label>Статус</label>
-                    <div class="detail-value">
-                        <span class="status-badge ${order.status_code}">
-                            ${window.demoData.helpers.getStatusLabel(order.status_code)}
-                        </span>
+            <!-- Accordion for order metadata -->
+            <div class="accordion" id="orderMetadataAccordion">
+                <button type="button" class="accordion-header" onclick="toggleAccordion('orderMetadataAccordion')">
+                    <div class="accordion-title">
+                        <i class="fas fa-info-circle"></i>
+                        <span>Информация о заказе</span>
                     </div>
-                </div>
-                
-                <div class="detail-group">
-                    <label>Проект</label>
-                    <div class="detail-value ${isEditable ? 'editable-field' : ''}" 
-                         data-field="project_id" 
-                         data-value="${order.project_id || ''}"
-                         data-type="select"
-                         ${isEditable ? 'title="Двойной клик для редактирования"' : ''}>${order.project ? order.project.name : '—'}</div>
-                </div>
-                
-                <div class="detail-group">
-                    <label>Создан</label>
-                    <div class="detail-value">${window.demoData.helpers.formatDate(order.created_at)}</div>
-                </div>
-                
-                <div class="detail-group">
-                    <label>Обновлен</label>
-                    <div class="detail-value">${window.demoData.helpers.formatDate(order.updated_at)}</div>
+                    <i class="fas fa-chevron-right accordion-icon"></i>
+                </button>
+                <div class="accordion-content">
+                    <div class="details-grid">
+                        <div class="detail-group">
+                            <label>Номер заказа</label>
+                            <div class="detail-value">${order.order_no}</div>
+                        </div>
+                        
+                        <div class="detail-group">
+                            <label>Название</label>
+                            <div class="detail-value ${isEditable ? 'editable-field' : ''}" 
+                                 data-field="name" 
+                                 data-value="${order.name}"
+                                 ${isEditable ? 'title="Двойной клик для редактирования"' : ''}>${order.name}</div>
+                        </div>
+                        
+                        <div class="detail-group">
+                            <label>Статус</label>
+                            <div class="detail-value">
+                                <span class="status-badge ${order.status_code}">
+                                    ${window.demoData.helpers.getStatusLabel(order.status_code)}
+                                </span>
+                            </div>
+                        </div>
+                        
+                        <div class="detail-group">
+                            <label>Проект</label>
+                            <div class="detail-value ${isEditable ? 'editable-field' : ''}" 
+                                 data-field="project_id" 
+                                 data-value="${order.project_id || ''}"
+                                 data-type="select"
+                                 ${isEditable ? 'title="Двойной клик для редактирования"' : ''}>${order.project ? order.project.name : '—'}</div>
+                        </div>
+                        
+                        <div class="detail-group">
+                            <label>Создан</label>
+                            <div class="detail-value">${window.demoData.helpers.formatDate(order.created_at)}</div>
+                        </div>
+                        
+                        <div class="detail-group">
+                            <label>Обновлен</label>
+                            <div class="detail-value">${window.demoData.helpers.formatDate(order.updated_at)}</div>
+                        </div>
+                    </div>
+                    
+                    ${order.note !== null && order.note !== undefined ? `
+                        <div class="detail-group">
+                            <label>Примечание</label>
+                            <div class="detail-value ${isEditable ? 'editable-field' : ''}" 
+                                 data-field="note" 
+                                 data-value="${order.note || ''}"
+                                 data-type="textarea"
+                                 ${isEditable ? 'title="Двойной клик для редактирования"' : ''}>${order.note || '—'}</div>
+                        </div>
+                    ` : ''}
                 </div>
             </div>
-            
-            ${order.note !== null && order.note !== undefined ? `
-                <div class="detail-group">
-                    <label>Примечание</label>
-                    <div class="detail-value ${isEditable ? 'editable-field' : ''}" 
-                         data-field="note" 
-                         data-value="${order.note || ''}"
-                         data-type="textarea"
-                         ${isEditable ? 'title="Двойной клик для редактирования"' : ''}>${order.note || '—'}</div>
-                </div>
-            ` : ''}
             
             <div class="order-sections">
                 <div class="section">
@@ -1858,6 +1870,32 @@ function saveFieldChange(field, newValue) {
     }
 }
 
+// Toggle accordion visibility
+function toggleAccordion(accordionId) {
+    const accordion = document.getElementById(accordionId);
+    if (!accordion) return;
+    
+    const header = accordion.querySelector('.accordion-header');
+    const content = accordion.querySelector('.accordion-content');
+    const icon = accordion.querySelector('.accordion-icon');
+    
+    if (!header || !content || !icon) return;
+    
+    const isExpanded = accordion.classList.contains('expanded');
+    
+    if (isExpanded) {
+        // Collapse
+        accordion.classList.remove('expanded');
+        header.classList.remove('expanded');
+        icon.style.transform = 'rotate(0deg)';
+    } else {
+        // Expand
+        accordion.classList.add('expanded');
+        header.classList.add('expanded');
+        icon.style.transform = 'rotate(90deg)';
+    }
+}
+
 // Export functions for global access
 window.popupsModule = {
     initializeModals,
@@ -1880,6 +1918,7 @@ window.popupsModule = {
     downloadFile,
     saveOrder,
     submitOrderFromForm,
+    toggleAccordion,
     // expose item/file handlers for main.js bridges
     addNewItem,
     removeItem,
@@ -1889,4 +1928,7 @@ window.popupsModule = {
     removeFile,
     markFormDirty
 };
+
+// Global function bridges for HTML onclick handlers
+window.toggleAccordion = (id) => window.popupsModule?.toggleAccordion(id);
     
