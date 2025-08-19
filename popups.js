@@ -96,7 +96,10 @@ function viewOrder(orderId) {
         ...order,
         project: order.project_id ? window.demoData.helpers.getProject(order.project_id) : null,
         items: order.items || [],
-        files: order.files || []
+        files: order.files || [],
+        // Add the is_editable property using the same logic as in demo-data.js
+        is_editable: (order.status_code === 'draft' || order.status_code === 'revision') && !order.is_archived,
+        is_returned_for_revision: order.status_code === 'revision'
     };
     
     document.getElementById('modalOrderTitle').textContent = `Заказ ${order.order_no}`;
@@ -117,9 +120,20 @@ function renderOrderDetails(order) {
         </div>
     ` : '';
     
+    // Check if order is editable
+    const isEditable = order.is_editable && (order.status_code === 'draft' || order.status_code === 'revision');
+    
     return `
-        <div class="order-details">
+        <div class="order-details" data-order-id="${order.id}">
             ${revisionInfo}
+            
+            ${isEditable ? `
+                <div class="inline-edit-hint">
+                    <i class="fas fa-info-circle"></i>
+                    <span class="desktop-hint">Двойной клик для редактирования полей</span>
+                    <span class="mobile-hint">Долгое нажатие для редактирования</span>
+                </div>
+            ` : ''}
             
             <div class="details-grid">
                 <div class="detail-group">
@@ -129,7 +143,10 @@ function renderOrderDetails(order) {
                 
                 <div class="detail-group">
                     <label>Название</label>
-                    <div class="detail-value">${order.name}</div>
+                    <div class="detail-value ${isEditable ? 'editable-field' : ''}" 
+                         data-field="name" 
+                         data-value="${order.name}"
+                         ${isEditable ? 'title="Двойной клик для редактирования"' : ''}>${order.name}</div>
                 </div>
                 
                 <div class="detail-group">
@@ -143,7 +160,11 @@ function renderOrderDetails(order) {
                 
                 <div class="detail-group">
                     <label>Проект</label>
-                    <div class="detail-value">${order.project ? order.project.name : '—'}</div>
+                    <div class="detail-value ${isEditable ? 'editable-field' : ''}" 
+                         data-field="project_id" 
+                         data-value="${order.project_id || ''}"
+                         data-type="select"
+                         ${isEditable ? 'title="Двойной клик для редактирования"' : ''}>${order.project ? order.project.name : '—'}</div>
                 </div>
                 
                 <div class="detail-group">
@@ -157,17 +178,21 @@ function renderOrderDetails(order) {
                 </div>
             </div>
             
-            ${order.note ? `
+            ${order.note !== null && order.note !== undefined ? `
                 <div class="detail-group">
                     <label>Примечание</label>
-                    <div class="detail-value">${order.note}</div>
+                    <div class="detail-value ${isEditable ? 'editable-field' : ''}" 
+                         data-field="note" 
+                         data-value="${order.note || ''}"
+                         data-type="textarea"
+                         ${isEditable ? 'title="Двойной клик для редактирования"' : ''}>${order.note || '—'}</div>
                 </div>
             ` : ''}
             
             <div class="order-sections">
                 <div class="section">
                     <h4><i class="fas fa-list"></i> Детали (${order.items.length})</h4>
-                    ${renderOrderItems(order.items)}
+                    ${renderOrderItems(order.items, isEditable)}
                 </div>
                 
                 <div class="section">
@@ -198,7 +223,7 @@ function renderOrderDetails(order) {
 }
 
 // Render order items
-function renderOrderItems(items) {
+function renderOrderItems(items, isEditable = false) {
     if (!items || items.length === 0) {
         return '<div class="empty-items">Детали не добавлены</div>';
     }
@@ -217,14 +242,56 @@ function renderOrderItems(items) {
                     </tr>
                 </thead>
                 <tbody>
-                    ${items.map(item => `
-                        <tr>
-                            <td class="item-size">${item.width} × ${item.height}</td>
-                            <td class="item-quantity">${item.quantity}</td>
-                            <td class="item-material">${getMaterialName(item.material_id)}</td>
-                            <td class="item-milling">${getMillingTypeName(item.milling_type_id)}</td>
+                    ${items.map((item, index) => `
+                        <tr data-item-id="${item.id}" data-item-index="${index}">
+                            <td class="item-size">
+                                <span class="${isEditable ? 'editable-field' : ''}" 
+                                      data-field="width" 
+                                      data-value="${item.width}"
+                                      data-type="number"
+                                      data-min="20" 
+                                      data-max="2800"
+                                      ${isEditable ? 'title="Двойной клик для редактирования"' : ''}>${item.width}</span>
+                                ×
+                                <span class="${isEditable ? 'editable-field' : ''}" 
+                                      data-field="height" 
+                                      data-value="${item.height}"
+                                      data-type="number"
+                                      data-min="20" 
+                                      data-max="2800"
+                                      ${isEditable ? 'title="Двойной клик для редактирования"' : ''}>${item.height}</span>
+                            </td>
+                            <td class="item-quantity">
+                                <span class="${isEditable ? 'editable-field' : ''}" 
+                                      data-field="quantity" 
+                                      data-value="${item.quantity}"
+                                      data-type="number"
+                                      data-min="1" 
+                                      data-max="9999"
+                                      ${isEditable ? 'title="Двойной клик для редактирования"' : ''}>${item.quantity}</span>
+                            </td>
+                            <td class="item-material">
+                                <span class="${isEditable ? 'editable-field' : ''}" 
+                                      data-field="material_id" 
+                                      data-value="${item.material_id || ''}"
+                                      data-type="select"
+                                      ${isEditable ? 'title="Двойной клик для редактирования"' : ''}>${getMaterialName(item.material_id)}</span>
+                            </td>
+                            <td class="item-milling">
+                                <span class="${isEditable ? 'editable-field' : ''}" 
+                                      data-field="milling_type_id" 
+                                      data-value="${item.milling_type_id || ''}"
+                                      data-type="select"
+                                      ${isEditable ? 'title="Двойной клик для редактирования"' : ''}>${getMillingTypeName(item.milling_type_id)}</span>
+                            </td>
                             <td class="item-finish">${getFinishInfo(item)}</td>
-                            <td class="item-note">${item.note || '—'}</td>
+                            <td class="item-note">
+                                <span class="${isEditable ? 'editable-field' : ''}" 
+                                      data-field="note" 
+                                      data-value="${item.note || ''}"
+                                      data-type="text"
+                                      ${isEditable ? 'title="Двойной клик для редактирования"' : ''}>${item.note || '—'}</span>
+                            </td>
                         </tr>
                     `).join('')}
                 </tbody>
@@ -1517,9 +1584,284 @@ function removeFile(fileId) {
     }
 }
 
+// Inline editing functionality
+let currentEditingElement = null;
+let longPressTimer = null;
+let isEditingActive = false;
+
+// Initialize inline editing
+function initializeInlineEditing() {
+    document.addEventListener('dblclick', handleDoubleClick);
+    document.addEventListener('touchstart', handleTouchStart, { passive: false });
+    document.addEventListener('touchend', handleTouchEnd);
+    document.addEventListener('click', handleEditingClick);
+    document.addEventListener('keydown', handleEditingKeydown);
+}
+
+// Handle double click for desktop
+function handleDoubleClick(e) {
+    const editableField = e.target.closest('.editable-field');
+    if (editableField && !isEditingActive) {
+        startInlineEdit(editableField);
+    }
+}
+
+// Handle touch events for mobile
+function handleTouchStart(e) {
+    const editableField = e.target.closest('.editable-field');
+    if (editableField && !isEditingActive) {
+        longPressTimer = setTimeout(() => {
+            e.preventDefault();
+            startInlineEdit(editableField);
+        }, 600); // 600ms long press
+    }
+}
+
+function handleTouchEnd(e) {
+    if (longPressTimer) {
+        clearTimeout(longPressTimer);
+        longPressTimer = null;
+    }
+}
+
+// Start inline editing
+function startInlineEdit(element) {
+    if (isEditingActive || currentEditingElement) return;
+    
+    const field = element.dataset.field;
+    const value = element.dataset.value;
+    const type = element.dataset.type || 'text';
+    
+    currentEditingElement = element;
+    isEditingActive = true;
+    
+    // Store original content
+    element.dataset.originalContent = element.textContent;
+    element.classList.add('editing');
+    
+    let editor;
+    
+    switch (type) {
+        case 'textarea':
+            editor = createTextareaEditor(value);
+            break;
+        case 'select':
+            editor = createSelectEditor(field, value);
+            break;
+        case 'number':
+            editor = createNumberEditor(value, element.dataset.min, element.dataset.max);
+            break;
+        default:
+            editor = createTextEditor(value);
+    }
+    
+    element.innerHTML = '';
+    element.appendChild(editor);
+    editor.focus();
+    
+    if (editor.select) {
+        editor.select();
+    }
+}
+
+// Create text editor
+function createTextEditor(value) {
+    const input = document.createElement('input');
+    input.type = 'text';
+    input.value = value;
+    input.className = 'inline-editor';
+    return input;
+}
+
+// Create number editor
+function createNumberEditor(value, min, max) {
+    const input = document.createElement('input');
+    input.type = 'number';
+    input.value = value;
+    input.className = 'inline-editor';
+    if (min) input.min = min;
+    if (max) input.max = max;
+    return input;
+}
+
+// Create textarea editor
+function createTextareaEditor(value) {
+    const textarea = document.createElement('textarea');
+    textarea.value = value;
+    textarea.className = 'inline-editor';
+    textarea.rows = 3;
+    return textarea;
+}
+
+// Create select editor
+function createSelectEditor(field, value) {
+    const select = document.createElement('select');
+    select.className = 'inline-editor';
+    
+    let options = [];
+    
+    switch (field) {
+        case 'project_id':
+            options = [{ id: '', name: '—' }, ...window.demoData.projects];
+            break;
+        case 'material_id':
+            options = [{ id: '', name: 'Выберите материал' }, ...window.demoData.materials];
+            break;
+        case 'milling_type_id':
+            options = [{ id: '', name: 'Выберите тип' }, ...window.demoData.millingTypes];
+            break;
+        default:
+            options = [{ id: value, name: value }];
+    }
+    
+    options.forEach(option => {
+        const opt = document.createElement('option');
+        opt.value = option.id;
+        opt.textContent = option.name;
+        opt.selected = option.id === value;
+        select.appendChild(opt);
+    });
+    
+    return select;
+}
+
+// Handle clicks during editing
+function handleEditingClick(e) {
+    if (isEditingActive && currentEditingElement) {
+        const editor = currentEditingElement.querySelector('.inline-editor');
+        if (editor && !editor.contains(e.target) && !currentEditingElement.contains(e.target)) {
+            saveInlineEdit();
+        }
+    }
+}
+
+// Handle keyboard events during editing
+function handleEditingKeydown(e) {
+    if (isEditingActive && currentEditingElement) {
+        if (e.key === 'Enter' && e.target.tagName !== 'TEXTAREA') {
+            e.preventDefault();
+            saveInlineEdit();
+        } else if (e.key === 'Escape') {
+            e.preventDefault();
+            cancelInlineEdit();
+        }
+    }
+}
+
+// Save inline edit
+function saveInlineEdit() {
+    if (!currentEditingElement || !isEditingActive) return;
+    
+    const editor = currentEditingElement.querySelector('.inline-editor');
+    if (!editor) return;
+    
+    const field = currentEditingElement.dataset.field;
+    const newValue = editor.value;
+    const type = currentEditingElement.dataset.type || 'text';
+    
+    // Validate input
+    if (type === 'number') {
+        const min = parseFloat(currentEditingElement.dataset.min);
+        const max = parseFloat(currentEditingElement.dataset.max);
+        const numValue = parseFloat(newValue);
+        
+        if (isNaN(numValue) || (min && numValue < min) || (max && numValue > max)) {
+            showNotification('error', `Значение должно быть числом от ${min || 0} до ${max || 'max'}`);
+            cancelInlineEdit();
+            return;
+        }
+    }
+    
+    // Update data attribute
+    currentEditingElement.dataset.value = newValue;
+    
+    // Update display
+    let displayValue = newValue;
+    if (field === 'project_id') {
+        const project = window.demoData.projects.find(p => p.id === newValue);
+        displayValue = project ? project.name : '—';
+    } else if (field === 'material_id') {
+        displayValue = getMaterialName(newValue);
+    } else if (field === 'milling_type_id') {
+        displayValue = getMillingTypeName(newValue);
+    } else if (!newValue.trim()) {
+        displayValue = '—';
+    }
+    
+    currentEditingElement.textContent = displayValue;
+    
+    // Save changes to demo data
+    saveFieldChange(field, newValue);
+    
+    finishInlineEdit();
+    showNotification('success', 'Изменение сохранено');
+}
+
+// Cancel inline edit
+function cancelInlineEdit() {
+    if (!currentEditingElement || !isEditingActive) return;
+    
+    currentEditingElement.textContent = currentEditingElement.dataset.originalContent;
+    finishInlineEdit();
+}
+
+// Finish inline editing
+function finishInlineEdit() {
+    if (currentEditingElement) {
+        currentEditingElement.classList.remove('editing');
+        delete currentEditingElement.dataset.originalContent;
+        currentEditingElement = null;
+    }
+    isEditingActive = false;
+}
+
+// Save field changes to demo data
+function saveFieldChange(field, newValue) {
+    const orderDetails = document.querySelector('.order-details');
+    const orderId = orderDetails?.dataset.orderId;
+    if (!orderId) return;
+    
+    const order = window.demoData.orders.find(o => o.id === orderId);
+    if (!order) return;
+    
+    // Check if this is an item field
+    const itemRow = currentEditingElement.closest('tr[data-item-id]');
+    if (itemRow) {
+        const itemIndex = parseInt(itemRow.dataset.itemIndex);
+        const item = order.items[itemIndex];
+        if (item) {
+            if (field === 'width' || field === 'height' || field === 'quantity') {
+                item[field] = parseFloat(newValue);
+            } else {
+                item[field] = newValue;
+            }
+            
+            // Update computed properties
+            order.total_quantity = order.items.reduce((sum, item) => sum + (item.quantity || 0), 0);
+        }
+    } else {
+        // Order-level field
+        if (field === 'project_id') {
+            order.project_id = newValue || null;
+            order.project = newValue ? window.demoData.projects.find(p => p.id === newValue) : null;
+        } else {
+            order[field] = newValue;
+        }
+    }
+    
+    // Update timestamp
+    order.updated_at = new Date().toISOString();
+    
+    // Refresh table if needed
+    if (window.filtersModule?.applyFilters) {
+        window.filtersModule.applyFilters();
+    }
+}
+
 // Export functions for global access
 window.popupsModule = {
     initializeModals,
+    initializeInlineEditing,
     openModal,
     closeModal,
     viewOrder,

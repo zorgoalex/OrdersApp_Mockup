@@ -826,6 +826,45 @@ const demoOrders = [
 // ---- Auto-extend demo dataset to required scale ----
 // Target: total 30 orders, 5 archived, 10 orders with >= 30 items
 
+// Helper to generate realistic order names
+function generateRealisticOrderName(index, project) {
+    const kitchenNames = [
+        'Фасады верхних шкафов', 'Фасады нижних шкафов', 'Столешница угловая', 
+        'Дверцы распашные', 'Панели декоративные', 'Цоколь и карнизы',
+        'Полки выдвижные', 'Фасады под технику', 'Столешница островная'
+    ];
+    
+    const bedroomNames = [
+        'Дверцы шкафа-купе', 'Полки гардеробные', 'Комод с ящиками',
+        'Изголовье кровати', 'Тумбы прикроватные', 'Панели стеновые',
+        'Дверцы встроенного шкафа', 'Полки угловые', 'Фасады комода'
+    ];
+    
+    const officeNames = [
+        'Столешницы рабочих мест', 'Тумбы офисные', 'Стеллажи модульные',
+        'Панели перегородок', 'Фасады шкафов', 'Полки архивные',
+        'Столы переговорные', 'Тумбы выкатные', 'Дверцы шкафов'
+    ];
+    
+    const generalNames = [
+        'Полки настенные', 'Панели декоративные', 'Дверцы мебельные',
+        'Столешница на заказ', 'Фасады распашные', 'Элементы корпусные'
+    ];
+    
+    let nameArray;
+    if (project?.name.includes('Кухня')) {
+        nameArray = kitchenNames;
+    } else if (project?.name.includes('Спальня')) {
+        nameArray = bedroomNames;
+    } else if (project?.name.includes('Офисная')) {
+        nameArray = officeNames;
+    } else {
+        nameArray = generalNames;
+    }
+    
+    return nameArray[(index - 1) % nameArray.length];
+}
+
 // Helper to generate N demo items
 function genItems(count){
     const res = [];
@@ -866,7 +905,7 @@ function genItems(count){
             prefix: 'W',
             client_id: 'client1',
             project_id: projects[(nextIdx-1) % projects.length]?.id || null,
-            name: `Сгенерированный заказ ${nextIdx}`,
+            name: generateRealisticOrderName(nextIdx, projects[(nextIdx-1) % projects.length]),
             note: '',
             status_code: 'draft',
             is_archived: false,

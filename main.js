@@ -156,6 +156,17 @@ async function initializeModules() {
             required: true
         },
         { 
+            name: 'inline-editing', 
+            init: () => {
+                if (window.popupsModule?.initializeInlineEditing) {
+                    window.popupsModule.initializeInlineEditing();
+                    return Promise.resolve();
+                }
+                return Promise.reject(new Error('inline editing not available'));
+            },
+            required: true
+        },
+        { 
             name: 'table', 
             init: () => {
                 if (window.tableModule?.initializeTable) {
