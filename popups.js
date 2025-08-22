@@ -245,6 +245,7 @@ function renderOrderItems(items, isEditable = false) {
             <table>
                 <thead>
                     <tr>
+                        <th>№</th>
                         <th>Размеры (мм)</th>
                         <th>Кол-во</th>
                         <th>Материал</th>
@@ -256,6 +257,7 @@ function renderOrderItems(items, isEditable = false) {
                 <tbody>
                     ${items.map((item, index) => `
                         <tr data-item-id="${item.id}" data-item-index="${index}">
+                            <td class="item-number">${index + 1}</td>
                             <td class="item-size">
                                 <span class="${isEditable ? 'editable-field' : ''}"
                                       data-field="width"

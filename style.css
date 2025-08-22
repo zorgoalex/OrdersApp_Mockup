@@ -1646,10 +1646,12 @@ select.inline-editor {
  overflow-y: auto;
  border: 1px solid #e5e7eb;
  border-radius: 6px;
+ max-width: 100%;
 }
 
 .items-table table {
  width: 100%;
+ min-width: 700px;
  border-collapse: collapse;
  font-size: 13px;
 }
@@ -1659,6 +1661,8 @@ select.inline-editor {
  padding: 8px 12px;
  text-align: left;
  border-bottom: 1px solid #f1f5f9;
+ white-space: nowrap;
+ min-width: 80px;
 }
 
 .items-table th {
@@ -1672,6 +1676,44 @@ select.inline-editor {
  border-bottom: 2px solid #e5e7eb !important;
 }
 
+/* Special styling for the number column header */
+.items-table th:first-child {
+ text-align: center;
+ width: 40px;
+ min-width: 40px;
+}
+
+/* Column width constraints for proper horizontal scrolling */
+.items-table th:nth-child(2), /* Size column */
+.items-table td.item-size {
+ min-width: 120px;
+}
+
+.items-table th:nth-child(3), /* Quantity column */
+.items-table td.item-quantity {
+ min-width: 80px;
+}
+
+.items-table th:nth-child(4), /* Material column */
+.items-table td.item-material {
+ min-width: 150px;
+}
+
+.items-table th:nth-child(5), /* Milling column */
+.items-table td.item-milling {
+ min-width: 150px;
+}
+
+.items-table th:nth-child(6), /* Finish column */
+.items-table td.item-finish {
+ min-width: 150px;
+}
+
+.items-table th:nth-child(7), /* Note column */
+.items-table td.item-note {
+ min-width: 150px;
+}
+
 .item-size {
  font-family: monospace;
  color: #2563eb;
@@ -1681,6 +1723,15 @@ select.inline-editor {
 .item-quantity {
  font-weight: 600;
  color: #059669;
+}
+
+.item-number {
+ text-align: center;
+ font-weight: 600;
+ color: #6b7280;
+ background-color: #f8fafc;
+ min-width: 40px;
+ width: 40px;
 }
 
 .empty-items,
@@ -2221,11 +2272,42 @@ input[type="number"]::-webkit-inner-spin-button { -webkit-appearance: none; marg
 
  .items-table {
      font-size: 12px;
+     /* Restore horizontal scrolling for order details view */
+     overflow-x: auto !important;
+     overflow-y: auto;
+     max-width: 100%;
+     border: 1px solid #e5e7eb;
+     border-radius: 6px;
+ }
+ 
+ .items-table table {
+     min-width: 700px !important; /* Ensure table has minimum width for horizontal scroll */
+     width: auto;
+     border-collapse: collapse;
  }
 
  .items-table th,
  .items-table td {
      padding: 6px 8px;
+     white-space: nowrap !important; /* Prevent text wrapping in table cells */
+     min-width: 80px;
+ }
+
+ /* Ensure specific columns have adequate width */
+ .items-table th:first-child,
+ .items-table td.item-number {
+     min-width: 40px;
+     width: 40px;
+ }
+
+ .items-table th:nth-child(2),
+ .items-table td.item-size {
+     min-width: 120px;
+ }
+
+ .items-table th:nth-child(7),
+ .items-table td.item-note {
+     min-width: 150px;
  }
 
  .file-item {
