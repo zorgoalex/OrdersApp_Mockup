@@ -102,7 +102,25 @@ function viewOrder(orderId) {
         is_returned_for_revision: order.status_code === 'revision'
     };
 
-    document.getElementById('modalOrderTitle').textContent = `Заказ ${order.order_no}`;
+    // Update modal title and action buttons in header
+    const modalHeader = document.querySelector('#orderDetailsModal .modal-header');
+    modalHeader.innerHTML = `
+        <h3 id="modalOrderTitle">Заказ ${order.order_no}</h3>
+        <div class="modal-header-actions">
+            ${orderWithDetails.is_editable ? `
+                <button class="header-action-btn" onclick="editOrder('${order.id}')" title="Редактировать">
+                    <i class="fas fa-edit"></i>
+                </button>
+            ` : ''}
+            <button class="header-action-btn" onclick="duplicateOrder('${order.id}'); closeModal('orderDetailsModal');" title="Дублировать">
+                <i class="fas fa-copy"></i>
+            </button>
+            <button class="modal-close" onclick="closeModal('orderDetailsModal')" title="Закрыть">
+                <i class="fas fa-times"></i>
+            </button>
+        </div>
+    `;
+    
     document.getElementById('orderDetailsContent').innerHTML = renderOrderDetails(orderWithDetails);
 
     openModal('orderDetailsModal');
@@ -213,23 +231,6 @@ function renderOrderDetails(order) {
                 </div>
             </div>
 
-            <div class="modal-actions">
-                ${order.is_editable ? `
-                    <button class="btn btn-primary" onclick="editOrder('${order.id}')">
-                        <i class="fas fa-edit"></i>
-                        Редактировать
-                    </button>
-                ` : ''}
-
-                <button class="btn btn-warning" onclick="duplicateOrder('${order.id}'); closeModal('orderDetailsModal');">
-                    <i class="fas fa-copy"></i>
-                    Дублировать
-                </button>
-
-                <button class="btn btn-secondary" onclick="closeModal('orderDetailsModal')">
-                    Закрыть
-                </button>
-            </div>
         </div>
     `;
 }
