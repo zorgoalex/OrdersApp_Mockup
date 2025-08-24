@@ -1484,8 +1484,6 @@ margin-left: auto;
 
 #orderDetailsModal .table-wrapper {
     display: block !important;
-    overflow-x: auto;
-    -webkit-overflow-scrolling: touch;
 }
 
 
@@ -1669,11 +1667,21 @@ select.inline-editor {
  border-radius: 0;
 }
 
+#orderDetailsModal .items-table {
+    overflow-x: auto;
+    -webkit-overflow-scrolling: touch;
+    width: 100%;
+}
+
 .items-table table {
  width: 100%;
  min-width: 700px;
  border-collapse: collapse;
  font-size: 13px;
+}
+
+#orderDetailsModal .items-table table {
+    width: auto;
 }
 
 .items-table th,
@@ -2214,9 +2222,9 @@ input[type="number"]::-webkit-inner-spin-button { -webkit-appearance: none; marg
      padding: 0;
  }
  
- /* Предотвращение горизонтального скролла в модальных окнах */
+ /* Предотвращение горизонтального скролла в модальных окнах, но разрешение для таблиц */
  .modal-content {
-     overflow-x: hidden;
+     overflow-x: visible;
      max-height: 90vh;
      overflow-y: auto;
  }
@@ -2296,6 +2304,13 @@ input[type="number"]::-webkit-inner-spin-button { -webkit-appearance: none; marg
      -webkit-overflow-scrolling: touch;
      width: 100%;
      position: relative;
+ }
+
+ /* Specific styles for order details modal table on mobile */
+ #orderDetailsModal .table-wrapper,
+ #orderDetailsModal .items-table {
+     overflow-x: auto !important;
+     -webkit-overflow-scrolling: touch !important;
  }
 
  .items-table {
