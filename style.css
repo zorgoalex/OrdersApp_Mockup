@@ -863,6 +863,7 @@ z-index: 200;
  max-width: 100%;
  max-height: 90vh;
  overflow-y: auto;
+ overflow-x: visible;
  position: relative;
  animation: modalSlide 0.3s ease;
 }
@@ -1481,6 +1482,13 @@ margin-left: auto;
  max-width: 100%;
 }
 
+#orderDetailsModal .table-wrapper {
+    display: block !important;
+    overflow-x: auto;
+    -webkit-overflow-scrolling: touch;
+}
+
+
 /* Ensure sticky headers work properly in modal */
 #orderDetailsModal .items-table th {
  background: #f8fafc;
@@ -1629,6 +1637,7 @@ select.inline-editor {
 .order-sections {
  display: grid;
  gap: 24px;
+ overflow-x: visible;
 }
 
 .section h4 {
@@ -1640,13 +1649,24 @@ select.inline-editor {
  font-size: 16px;
 }
 
-.items-table {
+/* Table wrapper for proper horizontal scrolling */
+.table-wrapper {
+ position: relative;
+ width: 100%;
  overflow-x: auto;
- max-height: calc(60vh - 100px);
- overflow-y: auto;
+ overflow-y: visible;
+ -webkit-overflow-scrolling: touch;
  border: 1px solid #e5e7eb;
  border-radius: 6px;
- max-width: 100%;
+}
+
+.items-table {
+ max-height: calc(60vh - 100px);
+ overflow-y: auto;
+ overflow-x: visible;
+ max-width: none;
+ border: none;
+ border-radius: 0;
 }
 
 .items-table table {
@@ -2270,14 +2290,19 @@ input[type="number"]::-webkit-inner-spin-button { -webkit-appearance: none; marg
      overflow: visible;
  }
 
+ /* Mobile table wrapper and scrolling */
+ .table-wrapper {
+     overflow-x: auto !important;
+     -webkit-overflow-scrolling: touch;
+     width: 100%;
+     position: relative;
+ }
+
  .items-table {
      font-size: 12px;
-     /* Restore horizontal scrolling for order details view */
-     overflow-x: auto !important;
+     overflow-x: visible;
      overflow-y: auto;
-     max-width: 100%;
-     border: 1px solid #e5e7eb;
-     border-radius: 6px;
+     border: none;
  }
  
  .items-table table {

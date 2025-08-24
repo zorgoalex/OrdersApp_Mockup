@@ -13,3 +13,6 @@ logs/
 
 # Claude
 .claude/
+
+# GEMINI
+GEMINI.md

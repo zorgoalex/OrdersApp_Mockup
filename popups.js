@@ -241,75 +241,77 @@ function renderOrderItems(items, isEditable = false) {
     }
 
     return `
-        <div class="items-table">
-            <table>
-                <thead>
-                    <tr>
-                        <th>№</th>
-                        <th>Размеры (мм)</th>
-                        <th>Кол-во</th>
-                        <th>Материал</th>
-                        <th>Фрезеровка</th>
-                        <th>Финиш</th>
-                        <th>Примечание</th>
-                    </tr>
-                </thead>
-                <tbody>
-                    ${items.map((item, index) => `
-                        <tr data-item-id="${item.id}" data-item-index="${index}">
-                            <td class="item-number">${index + 1}</td>
-                            <td class="item-size">
-                                <span class="${isEditable ? 'editable-field' : ''}"
-                                      data-field="width"
-                                      data-value="${item.width}"
-                                      data-type="number"
-                                      data-min="20"
-                                      data-max="2800"
-                                      ${isEditable ? 'title="Двойной клик для редактирования"' : ''}>${item.width}</span>
-                                ×
-                                <span class="${isEditable ? 'editable-field' : ''}"
-                                      data-field="height"
-                                      data-value="${item.height}"
-                                      data-type="number"
-                                      data-min="20"
-                                      data-max="2800"
-                                      ${isEditable ? 'title="Двойной клик для редактирования"' : ''}>${item.height}</span>
-                            </td>
-                            <td class="item-quantity">
-                                <span class="${isEditable ? 'editable-field' : ''}"
-                                      data-field="quantity"
-                                      data-value="${item.quantity}"
-                                      data-type="number"
-                                      data-min="1"
-                                      data-max="9999"
-                                      ${isEditable ? 'title="Двойной клик для редактирования"' : ''}>${item.quantity}</span>
-                            </td>
-                            <td class="item-material">
-                                <span class="${isEditable ? 'editable-field' : ''}"
-                                      data-field="material_id"
-                                      data-value="${item.material_id || ''}"
-                                      data-type="select"
-                                      ${isEditable ? 'title="Двойной клик для редактирования"' : ''}>${getMaterialName(item.material_id)}</span>
-                            </td>
-                            <td class="item-milling">
-                                <span class="${isEditable ? 'editable-field' : ''}"
-                                      data-field="milling_type_id"
-                                      data-value="${item.milling_type_id || ''}"
-                                      data-type="select"
-                                      ${isEditable ? 'title="Двойной клик для редактирования"' : ''}>${getMillingTypeName(item.milling_type_id)}</span>
-                            </td>
-                            <td class="item-finish">${getFinishInfo(item)}</td>
-                            <td class="item-note">
-                                <span class="${isEditable ? 'editable-field' : ''}"
-                                      data-field="note"
-                                      data-value="${item.note || ''}"
-                                      data-type="text"
-                                      ${isEditable ? 'title="Двойной клик для редактирования"' : ''}>${item.note || '—'}</span>
-                            </td>
+        <div class="table-wrapper">
+            <div class="items-table">
+                <table>
+                    <thead>
+                        <tr>
+                            <th>№</th>
+                            <th>Размеры (мм)</th>
+                            <th>Кол-во</th>
+                            <th>Материал</th>
+                            <th>Фрезеровка</th>
+                            <th>Финиш</th>
+                            <th>Примечание</th>
                         </tr>
-                    `).join('')}
-                </tbody>
-            </table>
+                    </thead>
+                    <tbody>
+                        ${items.map((item, index) => `
+                            <tr data-item-id="${item.id}" data-item-index="${index}">
+                                <td class="item-number">${index + 1}</td>
+                                <td class="item-size">
+                                    <span class="${isEditable ? 'editable-field' : ''}"
+                                          data-field="width"
+                                          data-value="${item.width}"
+                                          data-type="number"
+                                          data-min="20"
+                                          data-max="2800"
+                                          ${isEditable ? 'title="Двойной клик для редактирования"' : ''}>${item.width}</span>
+                                    ×
+                                    <span class="${isEditable ? 'editable-field' : ''}"
+                                          data-field="height"
+                                          data-value="${item.height}"
+                                          data-type="number"
+                                          data-min="20"
+                                          data-max="2800"
+                                          ${isEditable ? 'title="Двойной клик для редактирования"' : ''}>${item.height}</span>
+                                </td>
+                                <td class="item-quantity">
+                                    <span class="${isEditable ? 'editable-field' : ''}"
+                                          data-field="quantity"
+                                          data-value="${item.quantity}"
+                                          data-type="number"
+                                          data-min="1"
+                                          data-max="9999"
+                                          ${isEditable ? 'title="Двойной клик для редактирования"' : ''}>${item.quantity}</span>
+                                </td>
+                                <td class="item-material">
+                                    <span class="${isEditable ? 'editable-field' : ''}"
+                                          data-field="material_id"
+                                          data-value="${item.material_id || ''}"
+                                          data-type="select"
+                                          ${isEditable ? 'title="Двойной клик для редактирования"' : ''}>${getMaterialName(item.material_id)}</span>
+                                </td>
+                                <td class="item-milling">
+                                    <span class="${isEditable ? 'editable-field' : ''}"
+                                          data-field="milling_type_id"
+                                          data-value="${item.milling_type_id || ''}"
+                                          data-type="select"
+                                          ${isEditable ? 'title="Двойной клик для редактирования"' : ''}>${getMillingTypeName(item.milling_type_id)}</span>
+                                </td>
+                                <td class="item-finish">${getFinishInfo(item)}</td>
+                                <td class="item-note">
+                                    <span class="${isEditable ? 'editable-field' : ''}"
+                                          data-field="note"
+                                          data-value="${item.note || ''}"
+                                          data-type="text"
+                                          ${isEditable ? 'title="Двойной клик для редактирования"' : ''}>${item.note || '—'}</span>
+                                </td>
+                            </tr>
+                        `).join('')}
+                    </tbody>
+                </table>
+            </div>
         </div>
     `;
 }
