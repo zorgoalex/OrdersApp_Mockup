@@ -1116,6 +1116,20 @@ function duplicateOrder(orderId) {
     if (window.filtersModule?.applyFilters) {
         window.filtersModule.applyFilters();
     }
+
+    // Scroll to top on mobile where new order appears first
+    if (window.mainApp?.isMobile?.()) {
+        window.scrollTo({ top: 0, behavior: 'smooth' });
+    }
+
+    // Highlight the newly created order
+    setTimeout(() => {
+        const newElement = document.querySelector(`[data-order-id="${newOrder.id}"]`);
+        if (newElement) {
+            newElement.classList.add('new-order');
+            setTimeout(() => newElement.classList.remove('new-order'), 2000);
+        }
+    }, 100);
 }
 
 function archiveOrder(orderId) {
