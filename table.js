@@ -552,13 +552,19 @@ function updatePagination(totalItems) {
     // Update info
     const startItem = totalItems === 0 ? 0 : (currentPage - 1) * itemsPerPage + 1;
     const endItem = Math.min(currentPage * itemsPerPage, totalItems);
-    
+
+    // Shorter mobile text to keep one line
+    const isMobileView = window.innerWidth < 768;
+    const infoText = isMobileView
+        ? `${startItem}-${endItem} из ${totalItems}`
+        : `Показано ${startItem}-${endItem} из ${totalItems} заказов`;
+
     // Safely update pagination info
     const infoSpan = paginationInfo.querySelector('span');
     if (infoSpan) {
-        infoSpan.textContent = `Показано ${startItem}-${endItem} из ${totalItems} заказов`;
+        infoSpan.textContent = infoText;
     } else {
-        paginationInfo.textContent = `Показано ${startItem}-${endItem} из ${totalItems} заказов`;
+        paginationInfo.textContent = infoText;
     }
     
     // Generate pagination
@@ -582,8 +588,8 @@ function generatePaginationHTML(current, total) {
     // Page numbers (simplified for mobile)
     const isMobile = window.innerWidth < 768;
     if (isMobile) {
-        // Mobile: just show current page
-        html += `<span class="page-info">Страница ${current} из ${total}</span>`;
+        // Mobile: show only current page number between arrows
+        html += `<span class="page-info">${current}</span>`;
     } else {
         // Desktop: show page numbers
         const startPage = Math.max(1, current - 2);
@@ -792,8 +798,8 @@ const mobileMenuStyles = `
     }
     
     .page-info {
-        padding: 8px 12px;
-        font-size: 14px;
+        padding: 4px 8px;
+        font-size: 12px;
         color: #6b7280;
     }
     

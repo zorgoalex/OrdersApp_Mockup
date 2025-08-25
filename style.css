@@ -779,8 +779,11 @@ z-index: 200;
 
 /* Mobile optimization for sticky pagination */
 @media (max-width: 767px) {
+ .pagination-container {
+     padding: 6px 12px; /* reduce height on mobile */
+ }
  .pagination-container.sticky-pagination {
-     padding: 12px 16px;
+     padding: 6px 12px; /* reduce height ~2x */
      background: rgba(255, 255, 255, 0.95);
      backdrop-filter: blur(10px);
      -webkit-backdrop-filter: blur(10px);
@@ -789,12 +792,25 @@ z-index: 200;
 
  .pagination-container.sticky-pagination .pagination-info {
      font-size: 11px;
+     white-space: nowrap; /* prevent wrapping */
+ }
+
+ .pagination {
+     gap: 2px; /* tighter spacing */
  }
 
  .pagination-container.sticky-pagination .page-btn {
-     padding: 6px 10px;
-     font-size: 13px;
-     min-width: 36px;
+     padding: 4px 8px; /* smaller buttons */
+     font-size: 12px;
+     min-width: 30px;
+     min-height: 28px;
+ }
+
+ /* Center number between arrows smaller */
+ .page-info {
+     padding: 0 6px !important;
+     font-size: 12px !important;
+     line-height: 1 !important;
  }
 }
 
