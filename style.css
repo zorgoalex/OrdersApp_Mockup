@@ -2565,3 +2565,14 @@ input[type="number"]::-webkit-inner-spin-button { -webkit-appearance: none; marg
      padding: 14px;
  }
 }
+
+/* Highlight newly created order */
+@keyframes newOrderHighlight {
+ from { background-color: #fef3c7; }
+ to { background-color: transparent; }
+}
+
+.order-row.new-order,
+.order-card.new-order {
+ animation: newOrderHighlight 2s ease;
+}
