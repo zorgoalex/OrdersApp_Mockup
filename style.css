@@ -366,6 +366,57 @@ z-index: 200;
  font-size: 12px;
 }
 
+/* Mobile: fit 4 stat cards in one row and reduce footprint */
+@media (max-width: 767px) {
+ .page-title h1 {
+     display: none; /* Hide main page title on mobile */
+ }
+  .stats-grid {
+    grid-template-columns: repeat(4, 1fr);
+    gap: 8px;
+  }
+
+  /* Use grid to place icon+number on first row, label on second */
+  .stat-card {
+    padding: 8px;
+    gap: 4px;
+    display: grid;
+    grid-template-columns: auto 1fr;
+    grid-template-rows: auto auto;
+    align-items: center;
+  }
+
+  .stat-icon {
+    width: 24px;
+    height: 24px;
+    font-size: 14px;
+    border-radius: 6px;
+    grid-column: 1;
+    grid-row: 1;
+    justify-self: center;
+  }
+
+  /* Flatten stat-content so its children participate in the card grid */
+  .stat-content { display: contents; }
+
+  .stat-number {
+    grid-column: 2;
+    grid-row: 1;
+    line-height: 1.1; /* keep size, tighter line */
+    white-space: nowrap;
+    justify-self: start;
+  }
+
+  .stat-label {
+    grid-column: 1 / span 2;
+    grid-row: 2;
+    font-size: 8px; /* further reduce by ~25% */
+    line-height: 1.1;
+    margin-top: 2px;
+    text-align: center;
+  }
+}
+
 /* Filters Panel - Mobile */
 .filters-panel {
  background: #fff;
