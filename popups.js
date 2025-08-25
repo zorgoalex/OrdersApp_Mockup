@@ -1117,19 +1117,51 @@ function duplicateOrder(orderId) {
         window.filtersModule.applyFilters();
     }
 
-    // Scroll to top on mobile where new order appears first
-    if (window.mainApp?.isMobile?.()) {
+    // Ensure the new order is visible and highlighted (mobile and desktop)
+    const isMobile = document.body.classList.contains('mobile') || window.innerWidth < 768;
+
+    // After filters applied, ensure we are on the first page to see newest items
+    if (window.tableModule?.goToPage) {
+        try { window.tableModule.goToPage(1); } catch (e) {}
+    }
+
+    if (isMobile) {
+        // On mobile the new card appears at the top; scroll there
         window.scrollTo({ top: 0, behavior: 'smooth' });
     }
 
-    // Highlight the newly created order
-    setTimeout(() => {
-        const newElement = document.querySelector(`[data-order-id="${newOrder.id}"]`);
-        if (newElement) {
-            newElement.classList.add('new-order');
-            setTimeout(() => newElement.classList.remove('new-order'), 2000);
+    // Wait for UI to re-render; robustly poll for the element and then highlight it
+    (function highlightNewOrder(attempt = 0) {
+        const maxAttempts = 15; // ~1.5s with 100ms intervals
+        let targetElement = null;
+
+        if (isMobile) {
+            targetElement = document.querySelector(`.order-card[data-order-id="${newOrder.id}"]`);
+        } else {
+            targetElement = document.querySelector(`.order-row[data-order-id="${newOrder.id}"]`);
         }
-    }, 100);
+
+        if (!targetElement) {
+            targetElement = document.querySelector(`[data-order-id="${newOrder.id}"]`);
+        }
+
+        if (targetElement) {
+            targetElement.scrollIntoView({ behavior: 'smooth', block: 'center' });
+            targetElement.classList.add('new-order');
+            setTimeout(() => targetElement.classList.remove('new-order'), 2000);
+            return;
+        }
+
+        if (attempt < maxAttempts) {
+            setTimeout(() => highlightNewOrder(attempt + 1), 100);
+        } else if (window.filtersModule?.getFilteredOrders) {
+            const list = window.filtersModule.getFilteredOrders();
+            const present = Array.isArray(list) && list.some(o => o.id === newOrder.id);
+            if (!present) {
+                showNotification('success', 'Дубликат создан, но скрыт текущими фильтрами');
+            }
+        }
+    })();
 }
 
 function archiveOrder(orderId) {
